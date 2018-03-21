@@ -1,3 +1,2 @@
-# Warcaby
+# Rozpoznawanie obrazu z gry w warcaby oraz wizualizacja stanu gry na komputerze
 Documentation
-https://www.overleaf.com/read/htbngdphwrpp
