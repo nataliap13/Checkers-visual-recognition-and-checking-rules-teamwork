@@ -19,7 +19,9 @@ from Pages.PlayersPage import Players
 from Pages.InvitePage import Invite
 from Pages.InviteSecondPlayer import InviteSecondPlayer
 from Pages.AcceptGamePage import AcceptGame
+from Tests.Test_Movement import Movement
 class Server(EnvironmentSetup):
+
 
     def test_FirstPlayer(self):
         www="https://www.kurnik.pl/warcaby/"
@@ -38,7 +40,7 @@ class Server(EnvironmentSetup):
 
         login=Login(driver)
         login.setLogin("piotr1500")
-        login.setPassword("TUWPISACHASLO")
+        login.setPassword("Haslo12!")
         login.click_EnterButton()
 
 
@@ -47,7 +49,6 @@ class Server(EnvironmentSetup):
         window_after = driver.window_handles[1]
         driver.switch_to_window(window_after)
         
-
 
         print("Waiting  choose900")
 
@@ -80,7 +81,19 @@ class Server(EnvironmentSetup):
         acceptgame.click_AcceptGame(driver)
 
 
-        wait = int(input("I'm waiting for you ...~Titanic"))  
+        #time.sleep(1000)
+        Coordinates=driver.find_element_by_xpath("//*[contains(@style,'top: 504') and contains(@style,'left: 84')]")
+        while(True):
+            print("Before click")              
+            #pierwsza dodatnia to w prawo, druga ujemna to w gore
+            a1,a2=Movement.Get_and_Convert()
+            action = webdriver.common.action_chains.ActionChains(driver)
+            action.move_to_element_with_offset(Coordinates,a1, a2)
+            action.click()
+            action.perform()
+            print("After click")
+        
+        
 
 if __name__ == '__main__':
     unittest.main()
