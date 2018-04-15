@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Checkers_piece.cs" />
+    <Compile Include="Coordinates.cs" />
     <Compile Include="Draughts_Checkers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

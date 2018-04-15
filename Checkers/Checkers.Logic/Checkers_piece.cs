@@ -12,12 +12,26 @@ namespace Checkers.logic
     {
         private Piece type;
         public Checkers_piece(Piece type_)
-        {
-            type = type_;
-        }
+        { type = type_; }
 
-        public Piece get_type()
-        { return type; }
+        public Piece Type { get => type; }
+
+        override public string ToString()
+        {
+            switch (type)
+            {
+                case Piece.Black_king:
+                    { return ((int)type).ToString(); }
+                case Piece.Black_man:
+                    { return ((int)type).ToString(); }
+                case Piece.White_king:
+                    { return ((int)type).ToString(); }
+                case Piece.White_man:
+                    { return ((int)type).ToString(); }
+                default:
+                    { return "X "; }
+            }
+        }
 
     }
 }

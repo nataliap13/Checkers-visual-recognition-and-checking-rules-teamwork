@@ -13,12 +13,27 @@ namespace Checkers.logic
         {
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
-            Draughts_checkers game = new Draughts_checkers(r, pcs);
-            display_board(game.Get_board_black(), r);
-            display_board(game.Get_board_white(), r);
-
+            try
+            {
+                Draughts_checkers game = new Draughts_checkers(r, pcs);
+                Display_board(game, true);
+                Display_board(game, false);
+                Console.WriteLine(game.Generate_player_key(true));
+                Console.WriteLine(game.Generate_player_key(false));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
-        public static void display_board(Checkers_piece[,] board, int number_of_fields_in_row)
+        public static void Display_board(Draughts_checkers game, bool display_white)
+        {
+            if (display_white)
+            { Display_board(game.Get_board_white(), game.Number_of_fields_in_row); }
+            else
+            { Display_board(game.Get_board_black(), game.Number_of_fields_in_row); }
+        }
+        private static void Display_board(Checkers_piece[,] board, int number_of_fields_in_row)
         {
             Console.Write("\n");
             for (int i = 0; i < number_of_fields_in_row; i++)//i is row
@@ -27,21 +42,11 @@ namespace Checkers.logic
                 for (int j = 0; j < number_of_fields_in_row; j++)//j is column
                 {
                     if (board[i, j] == null)
-                    { Console.Write("N "); }
-
-                    else if (board[i, j].get_type() == Piece.Black_king)
-                    { Console.Write((int)board[i, j].get_type() + " "); }
-
-                    else if (board[i, j].get_type() == Piece.Black_man)
-                    { Console.Write((int)board[i, j].get_type() + " "); }
-
-                    else if (board[i, j].get_type() == Piece.White_king)
-                    { Console.Write((int)board[i, j].get_type() + " "); }
-
-                    else if (board[i, j].get_type() == Piece.White_man)
-                    { Console.Write((int)board[i, j].get_type() + " "); }
+                    { Console.Write("# "); }
                     else
-                    { Console.Write("X "); }
+                    {
+                        Console.Write(board[i, j].ToString() + " ");
+                    }
                 }
             }
             Console.Write("\n---");
