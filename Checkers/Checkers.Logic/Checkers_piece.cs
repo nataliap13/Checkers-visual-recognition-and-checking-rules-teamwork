@@ -4,33 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Checkers.logic
+namespace Checkers.Logic
 
 {
-    enum Piece { Black_man, White_man, Black_king, White_king };
+    enum Type { Man, King };
+    enum Color { Black, White };
     class Checkers_piece
     {
-        private Piece type;
-        public Checkers_piece(Piece type_)
-        { type = type_; }
+        private Type type;
+        private Color color;
+        public Checkers_piece(Color color_, Type type_)
+        {
+            type = type_;
+            color = color_;
+        }
 
-        public Piece Type { get => type; }
+        public Type Type { get => type; }
+        public Color Color { get => color; }
 
         override public string ToString()
         {
-            switch (type)
-            {
-                case Piece.Black_king:
-                    { return ((int)type).ToString(); }
-                case Piece.Black_man:
-                    { return ((int)type).ToString(); }
-                case Piece.White_king:
-                    { return ((int)type).ToString(); }
-                case Piece.White_man:
-                    { return ((int)type).ToString(); }
-                default:
-                    { return "X "; }
-            }
+            if (type == Type.Man && color == Color.Black)
+            { return "0"; }
+            else if (type == Type.Man && color == Color.White)
+            { return "1"; }
+            else if (type == Type.King && color == Color.Black)
+            { return "2"; }
+            else if (type == Type.King && color == Color.White)
+            { return "3"; }
+            else
+            { return "X "; }
         }
 
     }

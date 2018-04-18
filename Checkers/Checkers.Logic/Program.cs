@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Checkers.logic
+namespace Checkers.Logic
 
 {
     class Program
@@ -16,33 +16,42 @@ namespace Checkers.logic
             try
             {
                 Draughts_checkers game = new Draughts_checkers(r, pcs);
-                Display_board(game, true);
-                Display_board(game, false);
-                Console.WriteLine(game.Generate_player_key(true));
-                Console.WriteLine(game.Generate_player_key(false));
+                Display_board(game, Color.White);
+                Display_board(game, Color.Black);
+                var white_key = game.Generate_player_key(true);
+                Console.WriteLine("White key: " + white_key);
+
+                var black_key = game.Generate_player_key(false);
+                Console.WriteLine("Black key: " + black_key);
+                Coordinates begin = new Coordinates(0, 5);
+                Coordinates end = new Coordinates(1, 4);
+                game.Make_move(white_key, begin, end);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
         }
-        public static void Display_board(Draughts_checkers game, bool display_white)
+        private static void Display_board(Draughts_checkers game, Color color)
         {
-            if (display_white)
-            { Display_board(game.Get_board_white(), game.Number_of_fields_in_row); }
-            else
-            { Display_board(game.Get_board_black(), game.Number_of_fields_in_row); }
-        }
-        private static void Display_board(Checkers_piece[,] board, int number_of_fields_in_row)
-        {
-            Console.Write("\n");
+            Checkers_piece[,] board = game.Get_board(color);
+            int number_of_fields_in_row = game.Number_of_fields_in_row;
+            //Console.Write("\n");
+
+            Console.Write("\n---");
+            for (int i = 0; i < number_of_fields_in_row; i++)
+            {
+                Console.Write(i + " ");
+            }
+
             for (int i = 0; i < number_of_fields_in_row; i++)//i is row
             {
-                Console.Write("\n" + (number_of_fields_in_row - i - 1) + ". ");
+                Console.Write("\n" + i + ". ");
                 for (int j = 0; j < number_of_fields_in_row; j++)//j is column
                 {
                     if (board[i, j] == null)
-                    { Console.Write("# "); }
+                    { Console.Write("= "); }
+                    //{ Console.Write("# "); }
                     else
                     {
                         Console.Write(board[i, j].ToString() + " ");
