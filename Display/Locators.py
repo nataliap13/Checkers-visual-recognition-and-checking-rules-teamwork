@@ -26,6 +26,7 @@ class Locator(object):
         Players="//*[contains(text(), 'obecni')]"
         TakeSide1="(//*[@class='butsys butsit'])[1]"
         TakeSide2="(//*[@class='butsys butsit'])[2]"
+        NickPlayer="(//*[@class='nowrel'])[2]"
 
 #  Invite 
         Invite="//button[contains(text(), 'zaproś')]"
@@ -33,6 +34,7 @@ class Locator(object):
 
 #  InviteSecondPlayer  
         SecondPlayer="(//div[@class='ulnm' and contains(text(), 'piotrklient')])[2]"
+        #SecondPlayer="(//div[@class='ulnm' and contains(text(), 'kreska134')])[2]"
 
 
 #  AcceptGame
@@ -43,6 +45,10 @@ class Locator(object):
         Condition="//*[contains(text(), 'piotr1500 zaprasza do stołu')]"
         AcceptInvite= "(//button[@class='minw' and contains(text(), 'tak')])[1]"
         DeclineInvite=" (//button[@class='minw' and contains(text(), 'nie')])[1]"
+
+
+# Kick off the bad player
+        KickOff="(//*[@class='tplcont']//button)[4]"
 
 
 

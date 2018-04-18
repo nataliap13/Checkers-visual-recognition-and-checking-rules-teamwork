@@ -4,7 +4,7 @@ sys.path.append(parentddir)
 
 
 class Movement():
-
+   
     @staticmethod
     def Get_and_Convert():
         a = int(input("x "))
@@ -14,10 +14,10 @@ class Movement():
             ilex=0
         else:
             ilex=69*(a)+35
-        if b==0:
+        if b==7:
             iley=0
         else:
-            iley=(-69)*(b-1)-35
+            iley=69*(b-6)-35
         #print("ilex",ilex)
         #print("iley",iley)
         return ilex,iley
