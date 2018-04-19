@@ -16,16 +16,17 @@ namespace Checkers.Logic
             try
             {
                 Draughts_checkers game = new Draughts_checkers(r, pcs);
-                Display_board(game, Color.White);
-                Display_board(game, Color.Black);
                 var white_key = game.Generate_player_key(true);
                 Console.WriteLine("White key: " + white_key);
 
                 var black_key = game.Generate_player_key(false);
                 Console.WriteLine("Black key: " + black_key);
+                Display_board(game, Color.White);
+                //Display_board(game, Color.Black);
                 Coordinates begin = new Coordinates(0, 5);
                 Coordinates end = new Coordinates(1, 4);
                 game.Make_move(white_key, begin, end);
+                Display_board(game, Color.White);
             }
             catch (Exception e)
             {

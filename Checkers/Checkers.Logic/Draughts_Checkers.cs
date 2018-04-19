@@ -9,7 +9,7 @@ namespace Checkers.Logic
 {
     class Draughts_checkers
     {
-        private Checkers_piece[,] board;//row,column
+        private Checkers_piece[,] board_black;//row,column
         private int _number_of_fields_in_row;
         private int _number_of_white_men;
         private int _number_of_black_men;
@@ -29,7 +29,7 @@ namespace Checkers.Logic
             _number_of_fields_in_row = number_of_fields_in_row_;
             int number_of_whites = number_of_pieces_per_player;
             int number_of_blacks = number_of_pieces_per_player;
-            board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+            board_black = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
 
             for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
             {
@@ -37,7 +37,7 @@ namespace Checkers.Logic
                 {
                     if ((i % 2 + j % 2) == 1 && number_of_whites > 0)
                     {
-                        board[i, j] = new Checkers_piece(Color.White, Type.Man);
+                        board_black[i, j] = new Checkers_piece(Color.White, Type.Man);
                         number_of_whites--;
                     }
                     else if (number_of_whites == 0)
@@ -51,7 +51,7 @@ namespace Checkers.Logic
                 {
                     if ((i % 2 + j % 2) == 1 && number_of_blacks > 0)
                     {
-                        board[i, j] = new Checkers_piece(Color.Black, Type.Man);
+                        board_black[i, j] = new Checkers_piece(Color.Black, Type.Man);
                         number_of_blacks--;
                     }
                     else if (number_of_blacks == 0)
@@ -69,26 +69,35 @@ namespace Checkers.Logic
         public int Number_of_black_men { get => _number_of_black_men; }
         public int Number_of_white_kings { get => _number_of_white_kings; }
         public int Number_of_black_kings { get => _number_of_black_kings; }
+        //private Checkers_piece[,] Board_Black { set => board_black = value; }
+        //private Checkers_piece[,] Board_White { set => board_black = Rotate_board(value); }
 
         public Checkers_piece[,] Get_board(Color color)//row,column
         {
             if (color == Color.Black)
-            {
-                return board;
-            }
+            { return board_black; }
             else
-            {
-                Checkers_piece[,] white_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];//row,column
+            { return Rotate_board(board_black); }
+        }
+        private void Set_board(Color color, Checkers_piece[,] new_board)//row,column
+        {
+            if (color == Color.Black)
+            { board_black = new_board; }
+            else
+            { board_black = Rotate_board(new_board); }
+        }
+        private Checkers_piece[,] Rotate_board(Checkers_piece[,] board_to_rotate)
+        {
+            Checkers_piece[,] board_rotated = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];//row,column
 
-                for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
+            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
+            {
+                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
                 {
-                    for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
-                    {
-                        white_board[_number_of_fields_in_row - i - 1, _number_of_fields_in_row - j - 1] = board[i, j];
-                    }
+                    board_rotated[_number_of_fields_in_row - i - 1, _number_of_fields_in_row - j - 1] = board_to_rotate[i, j];
                 }
-                return white_board;
             }
+            return board_rotated;
         }
 
         public int Generate_player_key(bool is_player_white)
@@ -160,6 +169,7 @@ namespace Checkers.Logic
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
+                    Set_board(Check_active_player(), work_board); 
                 }
                 //przesuwanie damy w dowolnym kierunku
                 //bicie przy uzyciu damy
