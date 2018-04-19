@@ -44,7 +44,7 @@ class Server(EnvironmentSetup):
 # LOG IN
         login=Login(driver)
         login.setLogin("piotrklient")
-        login.setPassword("tutaj haslo")
+        login.setPassword("haslooooo")
         login.click_EnterButton()
 
         start=Start(driver)
@@ -70,11 +70,11 @@ class Server(EnvironmentSetup):
         players=Players(driver)
         players.click_TakeSide2(driver) 
         #tutaj wait czeka na  accepttgame
-
-
+  
         acceptgame=AcceptGame(driver)
         acceptgame.click_AcceptGame(driver)
-
+       
+        
 
         Coordinates=driver.find_element_by_xpath("//*[contains(@style,'top: 504') and contains(@style,'left: 84')]")
         while(True):

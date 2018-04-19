@@ -13,6 +13,7 @@ class Players(object):
         self.Invite=driver.find_element(By.XPATH, Locator.Invite)
         self.TakeSide1=driver.find_element(By.XPATH, Locator.TakeSide1)
         self.TakeSide2=driver.find_element(By.XPATH, Locator.TakeSide2)
+        self.NickPlayer=driver.find_element(By.XPATH, Locator.NickPlayer)
 
 
     def click_Players(self):

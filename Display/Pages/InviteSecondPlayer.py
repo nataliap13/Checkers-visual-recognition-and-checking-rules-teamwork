@@ -15,8 +15,8 @@ class InviteSecondPlayer(object):
 
     def click_InviteSecondPlayer(self,driver):
         self.SecondPlayer.click()
-        textplace=WebDriverWait(driver, 20).until(
-        EC.visibility_of_element_located((By.XPATH, Locator.AcceptGame)))
+        #textplace=WebDriverWait(driver, 20).until(
+        #EC.visibility_of_element_located((By.XPATH, Locator.AcceptGame)))
 
 
     
