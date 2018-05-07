@@ -144,11 +144,21 @@ namespace Checkers.Logic
             else
             { return false; }
         }
+        public Color Check_oponent_player()
+        {
+            if (_player_turn_key != _player_black_secret_key)
+            { return Color.Black; }
+
+            else if (_player_turn_key != _player_white_secret_key)
+            { return Color.White; }
+            else
+            { throw new Exception("The player did not join yet!"); }
+        }
 
         public void Make_move(int player_secret_key, Coordinates origin, Coordinates destination)//int is error code, to be implemented
         {
             if (Check_active_player(player_secret_key) == false)
-            { throw new Exception("Wrong player is trying to make a move. It's Not your turn!"); }
+            { throw new Exception("Wrong player is trying to make a move. It's Not your turn, " + Check_oponent_player() + "!"); }
 
             if (origin == destination)
             { throw new Exception("Origin and destination is the same field!"); }
@@ -156,12 +166,18 @@ namespace Checkers.Logic
             var work_board = Get_board(Check_active_player());
             var checkers_piece = work_board[origin.Y, origin.X];
             if (checkers_piece == null)
-            { throw new Exception("This field is empty!"); }
+            { throw new Exception("Origin field is empty!"); }
+
+            var checkers_piece_dest = work_board[destination.Y, destination.X];
+            if (checkers_piece_dest != null)
+            { throw new Exception("Destination field " + destination.ToString() + " is not empty!"); }
 
             if (Check_active_player() != checkers_piece.Color)
             { throw new Exception("Your are trying to move not your piece!"); }
 
-            if (work_board[destination.Y, destination.X] == null)//sprawdz czy pole destination jest puste
+            if ((destination.Y + destination.X) % 2 == 0)
+            { throw new Exception("Your are trying to move a piece to the white field!"); }
+            //wlasciwa rozgrywka
             {
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
@@ -169,16 +185,14 @@ namespace Checkers.Logic
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
-                    Set_board(Check_active_player(), work_board); 
+                    Set_board(Check_active_player(), work_board);
                 }
                 //przesuwanie damy w dowolnym kierunku
                 //bicie przy uzyciu damy
                 //czy jest bicie
                 else
-                { throw new Exception("Not allowed move!"); }
+                { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
             }
-            else
-            { throw new Exception("Destination field is not empty!"); }
 
             //sprawdz czy jest oddalone tylko o 1 od bierzacego
             //jesli nie to sprawdz czy na oddalonym o 1 jest pionek przeciwnika

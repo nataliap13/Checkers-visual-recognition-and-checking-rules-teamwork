@@ -26,5 +26,10 @@ namespace Checkers.Logic
         {
             return !(a == b);
         }
+        override public string ToString()
+        {
+            string result = "(" + X +"," + Y + ")";
+            return result;
+        }
     }
 }

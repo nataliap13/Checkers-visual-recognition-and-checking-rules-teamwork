@@ -26,12 +26,13 @@ namespace Checkers.Logic
                 Coordinates begin = new Coordinates(0, 5);
                 Coordinates end = new Coordinates(1, 4);
                 game.Make_move(white_key, begin, end);
+                game.Make_move(black_key, begin, end);
+                Display_board(game, Color.White);
+                game.Make_move(white_key, end, new Coordinates(2, 3));
                 Display_board(game, Color.White);
             }
             catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            { Console.WriteLine(e.Message); }
         }
         private static void Display_board(Draughts_checkers game, Color color)
         {
@@ -41,9 +42,7 @@ namespace Checkers.Logic
 
             Console.Write("\n---");
             for (int i = 0; i < number_of_fields_in_row; i++)
-            {
-                Console.Write(i + " ");
-            }
+            { Console.Write(i + " "); }
 
             for (int i = 0; i < number_of_fields_in_row; i++)//i is row
             {
@@ -54,17 +53,13 @@ namespace Checkers.Logic
                     { Console.Write("= "); }
                     //{ Console.Write("# "); }
                     else
-                    {
-                        Console.Write(board[i, j].ToString() + " ");
-                    }
+                    { Console.Write(board[i, j].ToString() + " "); }
                 }
             }
             Console.Write("\n---");
             for (int i = 0; i < number_of_fields_in_row; i++)
-            {
-                Console.Write(i + " ");
-            }
-            Console.Write("\n");
+            { Console.Write(i + " "); }
+            Console.Write(color + "\n");
         }
     }
 }
