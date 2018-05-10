@@ -181,14 +181,40 @@ namespace Checkers.Logic
             {
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
-                if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka do przodu tylko
+                if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
                     Set_board(Check_active_player(), work_board);
+                    if (checkers_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
+                    {
+                        work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
+                        Set_board(Check_active_player(), work_board);
+                        _number_of_white_men--;
+                        _number_of_white_kings++;
+                    }
                 }
-                //przesuwanie damy w dowolnym kierunku
-                //bicie przy uzyciu damy
+                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//przesuniecie pionka lub damy do przodu
+                {
+                    work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
+                    work_board[origin.Y, origin.X] = null;
+                    Set_board(Check_active_player(), work_board);
+                    if (checkers_piece.Type == Type.Man && destination.Y == 0)
+                    { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//jesli przesuwamy pionek o 1 i dociera on do bandy to na pewno zostanie on dama
+                }
+                //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
+                //todo to do
+                //!!!!!!!!!!!!!!!!!!!!!!
+                //!!!!!!!!!!!!!!!!!!!!!!
+                else if ((x_distance == y_distance) && checkers_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
+                {
+                    //trzeba sprawdzic czy po drodze nie ma pionka przeciwnika ktory mozna zbic
+                    //jesli na drodze jest nasz pionek to ruch nie moze zostac wykonany
+                    //todo to do
+                    work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
+                    work_board[origin.Y, origin.X] = null;
+                    Set_board(Check_active_player(), work_board);
+                }
                 //czy jest bicie
                 else
                 { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
