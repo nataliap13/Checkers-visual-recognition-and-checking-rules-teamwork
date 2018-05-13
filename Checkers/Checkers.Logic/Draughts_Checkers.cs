@@ -164,21 +164,28 @@ namespace Checkers.Logic
             { throw new Exception("Origin and destination is the same field!"); }
 
             var work_board = Get_board(Check_active_player());
-            var checkers_piece = work_board[origin.Y, origin.X];
-            if (checkers_piece == null)
+            var current_piece = work_board[origin.Y, origin.X];
+            if (current_piece == null)
             { throw new Exception("Origin field is empty!"); }
 
             var checkers_piece_dest = work_board[destination.Y, destination.X];
             if (checkers_piece_dest != null)
             { throw new Exception("Destination field " + destination.ToString() + " is not empty!"); }
 
-            if (Check_active_player() != checkers_piece.Color)
+            if (Check_active_player() != current_piece.Color)
             { throw new Exception("Your are trying to move not your piece!"); }
 
             if ((destination.Y + destination.X) % 2 == 0)
             { throw new Exception("Your are trying to move a piece to the white field!"); }
             //wlasciwa rozgrywka
             {
+                for(int i = 0; i < _number_of_fields_in_row; i++)
+                {
+
+                }
+                //najpierw trzeba poszukac czy dookola nie ma zadnego bicia
+                ///////////////////////////////////////////////////////////
+                //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
                 if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
@@ -186,7 +193,7 @@ namespace Checkers.Logic
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
                     Set_board(Check_active_player(), work_board);
-                    if (checkers_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
+                    if (current_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
                     {
                         work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
                         Set_board(Check_active_player(), work_board);
@@ -194,19 +201,41 @@ namespace Checkers.Logic
                         _number_of_white_kings++;
                     }
                 }
-                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//przesuniecie pionka lub damy do przodu
+                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem lub dama w dowolnym kierunku
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
+                    var oponent_piece_coords = new Coordinates((destination.X - x_distance/2), (destination.Y - y_distance/2));
+                    var oponent_piece = work_board[oponent_piece_coords.Y, oponent_piece_coords.X];
+                    Console.WriteLine(Check_oponent_player());
+                    Console.WriteLine(oponent_piece_coords.ToString());
+                    Console.WriteLine(oponent_piece.Color);
+                    Console.WriteLine(oponent_piece.Type);
+                    if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.Black && oponent_piece.Type == Type.Man)
+                    { _number_of_black_men--; }
+                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.Black && oponent_piece.Type == Type.King)
+                    { _number_of_black_kings--; }
+                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.White && oponent_piece.Type == Type.Man)
+                    { _number_of_white_men--; }
+                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.White && oponent_piece.Type == Type.King)
+                    { _number_of_white_kings--; }
+                    else
+                    { throw new Exception("Your are trying to jump over your own piece!"); }
+
+                    work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
                     Set_board(Check_active_player(), work_board);
-                    if (checkers_piece.Type == Type.Man && destination.Y == 0)
-                    { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//jesli przesuwamy pionek o 1 i dociera on do bandy to na pewno zostanie on dama
+                    if (current_piece.Type == Type.Man && destination.Y == 0)
+                    { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//to bedzie trzeba zmienic bo jesli jest dalsze bicie to tego nie ma!!!!!!!!!!!!
+                    //!!!!!!!!!!!!
+                    //todo
+                    //jezeli sa mozliwe kolejne bicia to ten gracz ma kolejny ruch
+                    //!!!!!!!!!!!!!!!!!!
                 }
                 //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
                 //todo to do
                 //!!!!!!!!!!!!!!!!!!!!!!
                 //!!!!!!!!!!!!!!!!!!!!!!
-                else if ((x_distance == y_distance) && checkers_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
+                else if ((x_distance == y_distance) && current_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
                 {
                     //trzeba sprawdzic czy po drodze nie ma pionka przeciwnika ktory mozna zbic
                     //jesli na drodze jest nasz pionek to ruch nie moze zostac wykonany
