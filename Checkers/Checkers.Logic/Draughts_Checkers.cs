@@ -188,16 +188,9 @@ namespace Checkers.Logic
                 {
                     for (int j = 0; j < _number_of_fields_in_row; j++)//column
                     {
-                        //var op_coord = new Coordinates(j - 1, i - 1);
-                        //var next_dest = new Coordinates(j - 2, i - 2);
-                        //if ((work_board[i, j].Color == Check_active_player()) && (work_board[i - 1, j - 1].Color == Check_oponent_player()) && (work_board[i - 2, j - 2] == null))
-                        {
-                            //Console.WriteLine("Znaleziono bicie!");
-                            //var copy_of_work_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            //Array.Copy(work_board, copy_of_work_board, _number_of_fields_in_row);
-                            //single_capturing_by_piece(ref board_with_next_move_done, new Coordinates(j, i), new Coordinates(j - 2, i - 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces = find_next_capture(work_board, new Coordinates(j, i));
-                        }
+                        number_of_captured_pieces = Math.Max(find_next_capture_for_this_piece(work_board, new Coordinates(j, i)), number_of_captured_pieces);
+                        //todo
+                        //nie max bo moze byc wiele opcji bicia dla wielu pionkow. trzeba zapisac wszystkie pionki z najdluzsymi drogami
                     }
                 }
                 Console.WriteLine("Znaleziono " + number_of_captured_pieces + " bic z rzedu.");
@@ -246,7 +239,7 @@ namespace Checkers.Logic
             //do something
             Switch_player_turn_key();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
         }
-        private int find_next_capture(Checkers_piece[,] work_board, Coordinates origin)//todo
+        private int find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)//todo
         {//jesli wykonano juz jedno bicie, to kolejne musi byc wykonane tym samym pionkiem
             try
             {
@@ -262,9 +255,9 @@ namespace Checkers.Logic
                         if ((work_board[origin.Y - 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X - 2] == null))
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            copy_of_board = work_board.Clone() as Checkers_piece[,];
                             single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_1 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X - 2, origin.Y - 2)));
+                            number_of_captured_pieces_1 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X - 2, origin.Y - 2)));
                         }
                     }
                     catch (Exception e)
@@ -273,19 +266,11 @@ namespace Checkers.Logic
                     try
                     {
                         if ((work_board[origin.Y - 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X + 2] == null))
-                        { int pointer = 0;
+                        {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            //Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
-                            //copy_of_board = work_board.Select(x => x.ToArray()).ToArray();
                             copy_of_board = work_board.Clone() as Checkers_piece[,];
-
-                            Console.WriteLine("Tu jestem!" + pointer++);
-                            Display_board_helper(copy_of_board, Check_active_player());
-                            Console.WriteLine("Tu jestem!" + pointer++);
                             single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
-                            Console.WriteLine("Tu jestem!" + pointer++);
-                            number_of_captured_pieces_2 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X + 2, origin.Y - 2)));
-                            Console.WriteLine("Tu jestem!" + pointer++);
+                            number_of_captured_pieces_2 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X + 2, origin.Y - 2)));
                         }
                     }
                     catch (Exception e)
@@ -296,9 +281,9 @@ namespace Checkers.Logic
                         if ((work_board[origin.Y + 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X + 2] == null))
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            copy_of_board = work_board.Clone() as Checkers_piece[,];
                             single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_3 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X + 2, origin.Y + 2)));
+                            number_of_captured_pieces_3 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X + 2, origin.Y + 2)));
                         }
                     }
                     catch (Exception e)
@@ -309,14 +294,26 @@ namespace Checkers.Logic
                         if ((work_board[origin.Y + 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X - 2] == null))
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            copy_of_board = work_board.Clone() as Checkers_piece[,];
                             single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_4 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X - 2, origin.Y + 2)));
+                            number_of_captured_pieces_4 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X - 2, origin.Y + 2)));
                         }
                     }
                     catch (Exception e)
                     { }
-                    return Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
+                    int max = Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
+                    int options = 0;
+                    if (number_of_captured_pieces_1 == max)
+                    { options++; }
+                    if (number_of_captured_pieces_2 == max)
+                    { options++; }
+                    if (number_of_captured_pieces_3 == max)
+                    { options++; }
+                    if (number_of_captured_pieces_4 == max)
+                    { options++; }
+                    //todo
+                    //trzeba sprawdzic, czy dwie drogi nei sa rownie dlugie. Jesli tak to oba pierwsze ruchy musza być dozwolone
+                    return max;
                 }
                 else
                 { throw new Exception("Something went wrong!"); }
@@ -356,29 +353,28 @@ namespace Checkers.Logic
             else
             { throw new Exception("Capturing is not allowed right now!"); }
         }
+        //private void Display_board_helper(Checkers_piece[,] board, Color color)
+        //{
+        //    Console.Write("\n---");
+        //    for (int i = 0; i < _number_of_fields_in_row; i++)
+        //    { Console.Write(i + " "); }
 
-        private  void Display_board_helper(Checkers_piece[,] board, Color color)
-        {
-            Console.Write("\n---");
-            for (int i = 0; i < _number_of_fields_in_row; i++)
-            { Console.Write(i + " "); }
-            
-            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
-            {
-                Console.Write("\n" + i + ". ");
-                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
-                {
-                    if (board[i, j] == null)
-                    { Console.Write("= "); }
-                    //{ Console.Write("# "); }
-                    else
-                    { Console.Write(board[i, j].ToString() + " "); }
-                }
-            }
-            Console.Write("\n---");
-            for (int i = 0; i < _number_of_fields_in_row; i++)
-            { Console.Write(i + " "); }
-            Console.Write(color + "\n");
-        }
+        //    for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
+        //    {
+        //        Console.Write("\n" + i + ". ");
+        //        for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
+        //        {
+        //            if (board[i, j] == null)
+        //            { Console.Write("= "); }
+        //            //{ Console.Write("# "); }
+        //            else
+        //            { Console.Write(board[i, j].ToString() + " "); }
+        //        }
+        //    }
+        //    Console.Write("\n---");
+        //    for (int i = 0; i < _number_of_fields_in_row; i++)
+        //    { Console.Write(i + " "); }
+        //    Console.Write(color + "\n");
+        //}
     }
 }
