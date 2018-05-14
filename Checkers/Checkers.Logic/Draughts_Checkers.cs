@@ -11,10 +11,6 @@ namespace Checkers.Logic
     {
         private Checkers_piece[,] board_black;//row,column
         private int _number_of_fields_in_row;
-        private int _number_of_white_men;
-        private int _number_of_black_men;
-        private int _number_of_white_kings;
-        private int _number_of_black_kings;
         private int _player_black_secret_key = 0;
         private int _player_white_secret_key = 0;
         private int _player_turn_key;
@@ -58,17 +54,22 @@ namespace Checkers.Logic
                     { break; }
                 }
             }
-            _number_of_white_men = number_of_pieces_per_player;
-            _number_of_black_men = number_of_pieces_per_player;
-            _number_of_white_kings = 0;
-            _number_of_black_kings = 0;
         }
 
         public int Number_of_fields_in_row { get => _number_of_fields_in_row; }
-        public int Number_of_white_men { get => _number_of_white_men; }
-        public int Number_of_black_men { get => _number_of_black_men; }
-        public int Number_of_white_kings { get => _number_of_white_kings; }
-        public int Number_of_black_kings { get => _number_of_black_kings; }
+        public int Number_of_pieces(Color color, Type type)
+        {
+            int number_of_pieces = 0;
+            for (int i = 0; i < Number_of_fields_in_row; i++)
+            {
+                for (int j = 0; j < Number_of_fields_in_row; j++)
+                {
+                    if (board_black[i, j].Color == color && board_black[i, j].Type == type)
+                    { number_of_pieces++; }
+                }
+            }
+            return number_of_pieces;
+        }
         //private Checkers_piece[,] Board_Black { set => board_black = value; }
         //private Checkers_piece[,] Board_White { set => board_black = Rotate_board(value); }
 
@@ -179,15 +180,34 @@ namespace Checkers.Logic
             { throw new Exception("Your are trying to move a piece to the white field!"); }
             //wlasciwa rozgrywka
             {
-                for(int i = 0; i < _number_of_fields_in_row; i++)
-                {
-
-                }
                 //najpierw trzeba poszukac czy dookola nie ma zadnego bicia
                 ///////////////////////////////////////////////////////////
+                //szukanie bicia dla pionka do przodu w lewo
+                int number_of_captured_pieces = 0;
+                for (int i = 0; i < _number_of_fields_in_row; i++)//row
+                {
+                    for (int j = 0; j < _number_of_fields_in_row; j++)//column
+                    {
+                        //var op_coord = new Coordinates(j - 1, i - 1);
+                        //var next_dest = new Coordinates(j - 2, i - 2);
+                        //if ((work_board[i, j].Color == Check_active_player()) && (work_board[i - 1, j - 1].Color == Check_oponent_player()) && (work_board[i - 2, j - 2] == null))
+                        {
+                            //Console.WriteLine("Znaleziono bicie!");
+                            //var copy_of_work_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                            //Array.Copy(work_board, copy_of_work_board, _number_of_fields_in_row);
+                            //single_capturing_by_piece(ref board_with_next_move_done, new Coordinates(j, i), new Coordinates(j - 2, i - 2));//trzeba wykonac to bicie na kopii planszy
+                            number_of_captured_pieces = find_next_capture(work_board, new Coordinates(j, i));
+                        }
+                    }
+                }
+                Console.WriteLine("Znaleziono " + number_of_captured_pieces + " bic z rzedu.");
+                //doto
+                //szukanie bicia dla damy
+
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
+
                 if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
@@ -197,39 +217,11 @@ namespace Checkers.Logic
                     {
                         work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
                         Set_board(Check_active_player(), work_board);
-                        _number_of_white_men--;
-                        _number_of_white_kings++;
                     }
                 }
-                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem lub dama w dowolnym kierunku
+                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
                 {
-                    work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
-                    work_board[origin.Y, origin.X] = null;
-                    var oponent_piece_coords = new Coordinates((destination.X - x_distance/2), (destination.Y - y_distance/2));
-                    var oponent_piece = work_board[oponent_piece_coords.Y, oponent_piece_coords.X];
-                    Console.WriteLine(Check_oponent_player());
-                    Console.WriteLine(oponent_piece_coords.ToString());
-                    Console.WriteLine(oponent_piece.Color);
-                    Console.WriteLine(oponent_piece.Type);
-                    if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.Black && oponent_piece.Type == Type.Man)
-                    { _number_of_black_men--; }
-                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.Black && oponent_piece.Type == Type.King)
-                    { _number_of_black_kings--; }
-                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.White && oponent_piece.Type == Type.Man)
-                    { _number_of_white_men--; }
-                    else if (Check_oponent_player() == oponent_piece.Color && oponent_piece.Color == Color.White && oponent_piece.Type == Type.King)
-                    { _number_of_white_kings--; }
-                    else
-                    { throw new Exception("Your are trying to jump over your own piece!"); }
-
-                    work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
-                    Set_board(Check_active_player(), work_board);
-                    if (current_piece.Type == Type.Man && destination.Y == 0)
-                    { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//to bedzie trzeba zmienic bo jesli jest dalsze bicie to tego nie ma!!!!!!!!!!!!
-                    //!!!!!!!!!!!!
-                    //todo
-                    //jezeli sa mozliwe kolejne bicia to ten gracz ma kolejny ruch
-                    //!!!!!!!!!!!!!!!!!!
+                    single_capturing_by_piece(ref work_board, origin, destination);
                 }
                 //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
                 //todo to do
@@ -253,6 +245,140 @@ namespace Checkers.Logic
             //jesli nie to sprawdz czy na oddalonym o 1 jest pionek przeciwnika
             //do something
             Switch_player_turn_key();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
+        }
+        private int find_next_capture(Checkers_piece[,] work_board, Coordinates origin)//todo
+        {//jesli wykonano juz jedno bicie, to kolejne musi byc wykonane tym samym pionkiem
+            try
+            {
+                if (work_board[origin.Y, origin.X].Color == Check_active_player())
+                {
+                    int number_of_captured_pieces_1 = 0;
+                    int number_of_captured_pieces_2 = 0;
+                    int number_of_captured_pieces_3 = 0;
+                    int number_of_captured_pieces_4 = 0;
+
+                    try
+                    {
+                        if ((work_board[origin.Y - 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X - 2] == null))
+                        {
+                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
+                            number_of_captured_pieces_1 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X - 2, origin.Y - 2)));
+                        }
+                    }
+                    catch (Exception e)
+                    { }
+
+                    try
+                    {
+                        if ((work_board[origin.Y - 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X + 2] == null))
+                        { int pointer = 0;
+                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                            //Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            //copy_of_board = work_board.Select(x => x.ToArray()).ToArray();
+                            copy_of_board = work_board.Clone() as Checkers_piece[,];
+
+                            Console.WriteLine("Tu jestem!" + pointer++);
+                            Display_board_helper(copy_of_board, Check_active_player());
+                            Console.WriteLine("Tu jestem!" + pointer++);
+                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
+                            Console.WriteLine("Tu jestem!" + pointer++);
+                            number_of_captured_pieces_2 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X + 2, origin.Y - 2)));
+                            Console.WriteLine("Tu jestem!" + pointer++);
+                        }
+                    }
+                    catch (Exception e)
+                    { }
+
+                    try
+                    {
+                        if ((work_board[origin.Y + 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X + 2] == null))
+                        {
+                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
+                            number_of_captured_pieces_3 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X + 2, origin.Y + 2)));
+                        }
+                    }
+                    catch (Exception e)
+                    { }
+
+                    try
+                    {
+                        if ((work_board[origin.Y + 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X - 2] == null))
+                        {
+                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                            Array.Copy(work_board, copy_of_board, _number_of_fields_in_row);
+                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
+                            number_of_captured_pieces_4 = (1 + find_next_capture(copy_of_board, new Coordinates(origin.X - 2, origin.Y + 2)));
+                        }
+                    }
+                    catch (Exception e)
+                    { }
+                    return Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
+                }
+                else
+                { throw new Exception("Something went wrong!"); }
+            }
+            catch (Exception e)
+            { }
+            return 0;
+        }
+        //tode
+        private void single_capturing_by_piece(ref Checkers_piece[,] work_board, Coordinates origin, Coordinates destination)
+        {
+            var current_piece = work_board[origin.Y, origin.X];
+            //odleglosc wraz ze znakiem zwrotu/kierunku
+            var x_distance = destination.X - origin.X;
+            var y_distance = destination.Y - origin.Y;
+
+            if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
+            {
+                work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
+                work_board[origin.Y, origin.X] = null;
+                var oponent_piece_coords = new Coordinates((destination.X - x_distance / 2), (destination.Y - y_distance / 2));
+                var oponent_piece = work_board[oponent_piece_coords.Y, oponent_piece_coords.X];
+                if (Check_oponent_player() == oponent_piece.Color)
+                { }
+                else
+                { throw new Exception("Your are trying to jump over your own piece!"); }
+
+                work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
+                Set_board(Check_active_player(), work_board);
+                if (current_piece.Type == Type.Man && destination.Y == 0)
+                { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//to bedzie trzeba zmienic bo jesli jest dalsze bicie to tego nie ma!!!!!!!!!!!!
+                //!!!!!!!!!!!!
+                //todo
+                //jezeli sa mozliwe kolejne bicia to ten gracz ma kolejny ruch
+                //!!!!!!!!!!!!!!!!!!
+            }
+            else
+            { throw new Exception("Capturing is not allowed right now!"); }
+        }
+
+        private  void Display_board_helper(Checkers_piece[,] board, Color color)
+        {
+            Console.Write("\n---");
+            for (int i = 0; i < _number_of_fields_in_row; i++)
+            { Console.Write(i + " "); }
+            
+            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
+            {
+                Console.Write("\n" + i + ". ");
+                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
+                {
+                    if (board[i, j] == null)
+                    { Console.Write("= "); }
+                    //{ Console.Write("# "); }
+                    else
+                    { Console.Write(board[i, j].ToString() + " "); }
+                }
+            }
+            Console.Write("\n---");
+            for (int i = 0; i < _number_of_fields_in_row; i++)
+            { Console.Write(i + " "); }
+            Console.Write(color + "\n");
         }
     }
 }

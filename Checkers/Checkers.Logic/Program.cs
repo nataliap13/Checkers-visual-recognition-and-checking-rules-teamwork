@@ -106,15 +106,11 @@ namespace Checkers.Logic
             //Display_board(game, Color.Black);
             Coordinates f1 = new Coordinates(0, 5);
             Coordinates f2 = new Coordinates(1, 4);
-            Coordinates f3 = new Coordinates(2, 3);
-            Coordinates f4 = new Coordinates(3, 2);
-            Coordinates f5 = new Coordinates(4, 1);
-            Coordinates f6 = new Coordinates(5, 0);
             Make_move_and_display_boards(ref game, white_key, f1, f2);
             Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
-            Make_move_and_display_boards(ref game, black_key, new Coordinates(0, 5), new Coordinates(1, 4));
-            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(1, 2));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(7, 2));
+            //Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(1, 2));
             //game.Make_move(black_key, new Coordinates(3, 6), new Coordinates(2, 5));
             //game.Make_move(white_key, f4, f5);
             //game.Make_move(black_key, new Coordinates(3, 4), new Coordinates(4, 3));
