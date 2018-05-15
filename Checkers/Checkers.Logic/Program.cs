@@ -13,7 +13,7 @@ namespace Checkers.Logic
         {
             try
             {
-                test_capturing_oponents_piece();
+                test_capturing_oponent_piece_by_multiple_pieces();
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
@@ -110,17 +110,45 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(7, 2));
+        }
+        private static void test_capturing_multiple_oponents_pieces_by_one_piece() //sprawdzic zamiane pionka na dame
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(true);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(false);
+            Console.WriteLine("Black key: " + black_key);
+            Display_board(game, Color.White);
+            //Display_board(game, Color.Black);
+            Coordinates f1 = new Coordinates(0, 5);
+            Coordinates f2 = new Coordinates(1, 4);
+            Make_move_and_display_boards(ref game, white_key, f1, f2);
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(4, 5), new Coordinates(3, 4));
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(3, 4), new Coordinates(5, 2));
+        }
+
+        private static void test_capturing_oponent_piece_by_multiple_pieces() //sprawdzic zamiane pionka na dame
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(true);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(false);
+            Console.WriteLine("Black key: " + black_key);
+            Display_board(game, Color.White);
+            //Display_board(game, Color.Black);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(0, 5), new Coordinates(1, 4));
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(6, 5), new Coordinates(5, 4));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             //Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(1, 2));
-            //game.Make_move(black_key, new Coordinates(3, 6), new Coordinates(2, 5));
-            //game.Make_move(white_key, f4, f5);
-            //game.Make_move(black_key, new Coordinates(3, 4), new Coordinates(4, 3));
-            //game.Make_move(white_key, new Coordinates(2, 5), f2);
-            //game.Make_move(black_key, new Coordinates(2, 5), new Coordinates(3, 4));
-            //game.Make_move(white_key, f2, new Coordinates(0, 3));
-            //game.Make_move(black_key, new Coordinates(1, 6), new Coordinates(2, 5));
-            //game.Make_move(white_key, new Coordinates(6, 5), new Coordinates(5, 4));
-            //game.Make_move(black_key, new Coordinates(2, 7), new Coordinates(1, 6));
-            //game.Make_move(white_key, f5, f6);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));
         }
     }
 }

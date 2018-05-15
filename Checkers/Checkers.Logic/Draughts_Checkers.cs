@@ -5,9 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Checkers.Logic
-
 {
-    class Draughts_checkers
+    public class Draughts_checkers
     {
         private Checkers_piece[,] board_black;//row,column
         private int _number_of_fields_in_row;
@@ -180,28 +179,72 @@ namespace Checkers.Logic
             { throw new Exception("Your are trying to move a piece to the white field!"); }
             //wlasciwa rozgrywka
             {
-                //najpierw trzeba poszukac czy dookola nie ma zadnego bicia
-                ///////////////////////////////////////////////////////////
                 //szukanie bicia dla pionka do przodu w lewo
+                List<Coordinates> pieces_that_one_of_them_must_be_moved = new List<Coordinates>();
                 int number_of_captured_pieces = 0;
                 for (int i = 0; i < _number_of_fields_in_row; i++)//row
                 {
                     for (int j = 0; j < _number_of_fields_in_row; j++)//column
                     {
-                        number_of_captured_pieces = Math.Max(find_next_capture_for_this_piece(work_board, new Coordinates(j, i)), number_of_captured_pieces);
-                        //todo
-                        //nie max bo moze byc wiele opcji bicia dla wielu pionkow. trzeba zapisac wszystkie pionki z najdluzsymi drogami
+                        int number_of_captured_pieces_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i));
+                        if (number_of_captured_pieces_for_this_piece == number_of_captured_pieces && number_of_captured_pieces > 0)
+                        {
+                            pieces_that_one_of_them_must_be_moved.Add(new Coordinates(j, i));
+                        }
+                        else if (number_of_captured_pieces_for_this_piece > number_of_captured_pieces)
+                        {
+                            number_of_captured_pieces = number_of_captured_pieces_for_this_piece;
+                            pieces_that_one_of_them_must_be_moved = new List<Coordinates> { new Coordinates(j, i) };
+                        }
                     }
+                    //todo
+                    //nie max bo moze byc wiele opcji bicia dla wielu pionkow. trzeba zapisac wszystkie pionki z najdluzsymi drogami
                 }
-                Console.WriteLine("Znaleziono " + number_of_captured_pieces + " bic z rzedu.");
+                Console.WriteLine("\nZnaleziono " + number_of_captured_pieces + " bic z rzedu.");
+                Console.WriteLine("Najdluzsze bicie/bicia mozna wykonac pionkami: ");
+                foreach (var piece in pieces_that_one_of_them_must_be_moved)
+                {
+                    Console.Write(piece.ToString() + " ");
+                }
+                Console.WriteLine("");
                 //doto
                 //szukanie bicia dla damy
 
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
-
-                if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
+                if (number_of_captured_pieces > 0)//bicie jest obowiazkowe
+                {
+                    //todo
+                    //trzeba pilnować by wykonać najdłuższe bicie gdy 1 pionek ma dwie drogi bicia. Trzeba zapisac pozycje na ktora musi byc dokladnie przesuniety ten pionek bijacy
+                    //todo first priority!!!!!!!!!!!!!!
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if(pieces_that_one_of_them_must_be_moved.Exists(x => x== origin) == false)
+                    {
+                        string s = string.Empty;
+                        for (int i = 0; i < pieces_that_one_of_them_must_be_moved.Count() - 1; i++)
+                        { s += pieces_that_one_of_them_must_be_moved[i].ToString() + " or "; }
+                        s += pieces_that_one_of_them_must_be_moved[pieces_that_one_of_them_must_be_moved.Count() - 1];
+                        throw new Exception("You have to move with " + s);
+                    }
+                    if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
+                    {
+                        single_capturing_by_piece(ref work_board, origin, destination);
+                    }
+                    else
+                    {
+                        string s = string.Empty;
+                        for (int i = 0; i < pieces_that_one_of_them_must_be_moved.Count() - 1; i++)
+                        { s += pieces_that_one_of_them_must_be_moved[i].ToString() + "or"; }
+                        s += pieces_that_one_of_them_must_be_moved[pieces_that_one_of_them_must_be_moved.Count() - 1];
+                        throw new Exception("You have to move with " + s);
+                    }
+                    //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
+                    //todo to do
+                    //!!!!!!!!!!!!!!!!!!!!!!
+                    //!!!!!!!!!!!!!!!!!!!!!!
+                }
+                else if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
@@ -212,14 +255,6 @@ namespace Checkers.Logic
                         Set_board(Check_active_player(), work_board);
                     }
                 }
-                else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
-                {
-                    single_capturing_by_piece(ref work_board, origin, destination);
-                }
-                //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
-                //todo to do
-                //!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!
                 else if ((x_distance == y_distance) && current_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
                 {
                     //trzeba sprawdzic czy po drodze nie ma pionka przeciwnika ktory mozna zbic
@@ -302,15 +337,15 @@ namespace Checkers.Logic
                     catch (Exception e)
                     { }
                     int max = Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
-                    int options = 0;
-                    if (number_of_captured_pieces_1 == max)
-                    { options++; }
-                    if (number_of_captured_pieces_2 == max)
-                    { options++; }
-                    if (number_of_captured_pieces_3 == max)
-                    { options++; }
-                    if (number_of_captured_pieces_4 == max)
-                    { options++; }
+                    //int options = 0;
+                    //if (number_of_captured_pieces_1 == max)
+                    //{ options++; }
+                    //if (number_of_captured_pieces_2 == max)
+                    //{ options++; }
+                    //if (number_of_captured_pieces_3 == max)
+                    //{ options++; }
+                    //if (number_of_captured_pieces_4 == max)
+                    //{ options++; }
                     //todo
                     //trzeba sprawdzic, czy dwie drogi nei sa rownie dlugie. Jesli tak to oba pierwsze ruchy musza być dozwolone
                     return max;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic
 {
-    class Coordinates
+    public class Coordinates
     {
         private int _x;
         private int _y;
@@ -20,7 +20,7 @@ namespace Checkers.Logic
         public int Y { get => _y; }
         public static bool operator == (Coordinates a, Coordinates b)
         {
-            return a.X == b.X && a.Y == b.Y;
+            return ((a.X == b.X) && (a.Y == b.Y));
         }
         public static bool operator != (Coordinates a, Coordinates b)
         {

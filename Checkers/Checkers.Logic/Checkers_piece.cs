@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Checkers.Logic
 
 {
-    enum Type { Man, King };
-    enum Color { Black, White };
-    class Checkers_piece
+    public enum Type { Man, King };
+    public enum Color { Black, White };
+    public class Checkers_piece
     {
         private Type type;
         private Color color;
