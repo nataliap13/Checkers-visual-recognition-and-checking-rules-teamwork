@@ -180,33 +180,43 @@ namespace Checkers.Logic
             //wlasciwa rozgrywka
             {
                 //szukanie bicia dla pionka do przodu w lewo
-                List<Coordinates> pieces_that_one_of_them_must_be_moved = new List<Coordinates>();
+                List<List<Coordinates>> possible_ways = new List<List<Coordinates>>();
                 int number_of_captured_pieces = 0;
                 for (int i = 0; i < _number_of_fields_in_row; i++)//row
                 {
                     for (int j = 0; j < _number_of_fields_in_row; j++)//column
                     {
-                        int number_of_captured_pieces_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i));
+                        List<Coordinates> destinations = new List<Coordinates>();
+                        int number_of_captured_pieces_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i), ref destinations);
                         if (number_of_captured_pieces_for_this_piece == number_of_captured_pieces && number_of_captured_pieces > 0)
                         {
-                            pieces_that_one_of_them_must_be_moved.Add(new Coordinates(j, i));
+                            destinations.Reverse();
+                            destinations.Add(new Coordinates(j, i));
+                            destinations.Reverse();
+                            possible_ways.Add(destinations);
                         }
                         else if (number_of_captured_pieces_for_this_piece > number_of_captured_pieces)
                         {
                             number_of_captured_pieces = number_of_captured_pieces_for_this_piece;
-                            pieces_that_one_of_them_must_be_moved = new List<Coordinates> { new Coordinates(j, i) };
+                            possible_ways = new List<List<Coordinates>>();
+                            destinations.Reverse();
+                            destinations.Add(new Coordinates(j, i));
+                            destinations.Reverse();
+                            possible_ways.Add(destinations);
                         }
                     }
-                    //todo
-                    //nie max bo moze byc wiele opcji bicia dla wielu pionkow. trzeba zapisac wszystkie pionki z najdluzsymi drogami
                 }
                 Console.WriteLine("\nZnaleziono " + number_of_captured_pieces + " bic z rzedu.");
                 Console.WriteLine("Najdluzsze bicie/bicia mozna wykonac pionkami: ");
-                foreach (var piece in pieces_that_one_of_them_must_be_moved)
+                foreach (var way in possible_ways)
                 {
-                    Console.Write(piece.ToString() + " ");
+                    foreach (var jump in way)
+                    {
+                        Console.Write(" -> " + jump.ToString());
+                    }
+                    Console.WriteLine("\nlub");
                 }
-                Console.WriteLine("");
+                Console.WriteLine("Koniec opcji.");
                 //doto
                 //szukanie bicia dla damy
 
@@ -219,12 +229,12 @@ namespace Checkers.Logic
                     //trzeba pilnować by wykonać najdłuższe bicie gdy 1 pionek ma dwie drogi bicia. Trzeba zapisac pozycje na ktora musi byc dokladnie przesuniety ten pionek bijacy
                     //todo first priority!!!!!!!!!!!!!!
                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if(pieces_that_one_of_them_must_be_moved.Exists(x => x== origin) == false)
+                    if (possible_ways.Exists(x => x.First() == origin) == false)
                     {
                         string s = string.Empty;
-                        for (int i = 0; i < pieces_that_one_of_them_must_be_moved.Count() - 1; i++)
-                        { s += pieces_that_one_of_them_must_be_moved[i].ToString() + " or "; }
-                        s += pieces_that_one_of_them_must_be_moved[pieces_that_one_of_them_must_be_moved.Count() - 1];
+                        for (int i = 0; i < possible_ways.Count() - 1; i++)
+                        { s += possible_ways[i].ToString() + " or "; }
+                        s += possible_ways[possible_ways.Count() - 1];
                         throw new Exception("You have to move with " + s);
                     }
                     if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
@@ -234,9 +244,9 @@ namespace Checkers.Logic
                     else
                     {
                         string s = string.Empty;
-                        for (int i = 0; i < pieces_that_one_of_them_must_be_moved.Count() - 1; i++)
-                        { s += pieces_that_one_of_them_must_be_moved[i].ToString() + "or"; }
-                        s += pieces_that_one_of_them_must_be_moved[pieces_that_one_of_them_must_be_moved.Count() - 1];
+                        for (int i = 0; i < possible_ways.Count() - 1; i++)
+                        { s += possible_ways[i].ToString() + "or"; }
+                        s += possible_ways[possible_ways.Count() - 1];
                         throw new Exception("You have to move with " + s);
                     }
                     //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
@@ -274,7 +284,7 @@ namespace Checkers.Logic
             //do something
             Switch_player_turn_key();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
         }
-        private int find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)//todo
+        private int find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin, ref List<Coordinates> destinations)//todo
         {//jesli wykonano juz jedno bicie, to kolejne musi byc wykonane tym samym pionkiem
             try
             {
@@ -284,6 +294,10 @@ namespace Checkers.Logic
                     int number_of_captured_pieces_2 = 0;
                     int number_of_captured_pieces_3 = 0;
                     int number_of_captured_pieces_4 = 0;
+                    Coordinates dest1 = new Coordinates(origin.X - 2, origin.Y - 2);
+                    Coordinates dest2 = new Coordinates(origin.X + 2, origin.Y - 2);
+                    Coordinates dest3 = new Coordinates(origin.X + 2, origin.Y + 2);
+                    Coordinates dest4 = new Coordinates(origin.X - 2, origin.Y + 2);
 
                     try
                     {
@@ -291,8 +305,9 @@ namespace Checkers.Logic
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                             copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_1 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X - 2, origin.Y - 2)));
+                            single_capturing_by_piece(ref copy_of_board, origin, dest1);//trzeba wykonac to bicie na kopii planszy
+                            List<Coordinates> unused_list = new List<Coordinates>();
+                            number_of_captured_pieces_1 = (1 + find_next_capture_for_this_piece(copy_of_board, dest1, ref unused_list));
                         }
                     }
                     catch (Exception e)
@@ -304,8 +319,9 @@ namespace Checkers.Logic
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                             copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y - 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_2 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X + 2, origin.Y - 2)));
+                            single_capturing_by_piece(ref copy_of_board, origin, dest2);//trzeba wykonac to bicie na kopii planszy
+                            List<Coordinates> unused_list = new List<Coordinates>();
+                            number_of_captured_pieces_2 = (1 + find_next_capture_for_this_piece(copy_of_board, dest2, ref unused_list));
                         }
                     }
                     catch (Exception e)
@@ -317,8 +333,9 @@ namespace Checkers.Logic
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                             copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X + 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_3 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X + 2, origin.Y + 2)));
+                            single_capturing_by_piece(ref copy_of_board, origin, dest3);//trzeba wykonac to bicie na kopii planszy
+                            List<Coordinates> unused_list = new List<Coordinates>();
+                            number_of_captured_pieces_3 = (1 + find_next_capture_for_this_piece(copy_of_board, dest3, ref unused_list));
                         }
                     }
                     catch (Exception e)
@@ -330,24 +347,25 @@ namespace Checkers.Logic
                         {
                             var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                             copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, new Coordinates(origin.X - 2, origin.Y + 2));//trzeba wykonac to bicie na kopii planszy
-                            number_of_captured_pieces_4 = (1 + find_next_capture_for_this_piece(copy_of_board, new Coordinates(origin.X - 2, origin.Y + 2)));
+                            single_capturing_by_piece(ref copy_of_board, origin, dest4);//trzeba wykonac to bicie na kopii planszy
+                            List<Coordinates> unused_list = new List<Coordinates>();
+                            number_of_captured_pieces_4 = (1 + find_next_capture_for_this_piece(copy_of_board, dest4, ref unused_list));
                         }
                     }
                     catch (Exception e)
                     { }
                     int max = Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
-                    //int options = 0;
-                    //if (number_of_captured_pieces_1 == max)
-                    //{ options++; }
-                    //if (number_of_captured_pieces_2 == max)
-                    //{ options++; }
-                    //if (number_of_captured_pieces_3 == max)
-                    //{ options++; }
-                    //if (number_of_captured_pieces_4 == max)
-                    //{ options++; }
+
+                    if (number_of_captured_pieces_1 == max)
+                    { destinations.Add(dest1); }
+                    if (number_of_captured_pieces_2 == max)
+                    { destinations.Add(dest2); }
+                    if (number_of_captured_pieces_3 == max)
+                    { destinations.Add(dest3); }
+                    if (number_of_captured_pieces_4 == max)
+                    { destinations.Add(dest4); }
                     //todo
-                    //trzeba sprawdzic, czy dwie drogi nei sa rownie dlugie. Jesli tak to oba pierwsze ruchy musza być dozwolone
+                    //trzeba sprawdzic, czy dwie drogi nie sa rownie dlugie. Jesli tak to oba pierwsze ruchy musza być dozwolone
                     return max;
                 }
                 else
