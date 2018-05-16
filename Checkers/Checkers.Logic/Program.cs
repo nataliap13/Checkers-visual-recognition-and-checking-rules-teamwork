@@ -147,7 +147,7 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, black_key, new Coordinates(0, 5), new Coordinates(1, 4));
             Make_move_and_display_boards(ref game, white_key, new Coordinates(6, 5), new Coordinates(5, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
-            //Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(1, 2));
+            //Make_move_and_display_boards(ref game, white_key, new Coordinates(7, 6), new Coordinates(6, 5));//runs wrong way exception
             Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));
         }
     }

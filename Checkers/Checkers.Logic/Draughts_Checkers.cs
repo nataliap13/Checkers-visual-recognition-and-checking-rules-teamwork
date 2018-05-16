@@ -225,19 +225,34 @@ namespace Checkers.Logic
                 var y_distance = destination.Y - origin.Y;
                 if (number_of_captured_pieces > 0)//bicie jest obowiazkowe
                 {
-                    //todo
-                    //trzeba pilnować by wykonać najdłuższe bicie gdy 1 pionek ma dwie drogi bicia. Trzeba zapisac pozycje na ktora musi byc dokladnie przesuniety ten pionek bijacy
-                    //todo first priority!!!!!!!!!!!!!!
-                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if (possible_ways.Exists(x => x.First() == origin) == false)
+                    List<Coordinates> chosen_way = new List<Coordinates>();//szukanie sciezki wybranej przez gracza
+                    foreach(var way in possible_ways)
+                    {
+                        if ((way[0] == origin) && (way[1] == destination))
+                        {
+                            chosen_way = way;
+                        }
+                    }
+                    if(chosen_way.Count() == 0)
+                    //if (possible_ways.Exists(x => x.First() == origin) == false)//stare rozwiazanie ktore nie uwzglednialo destination
                     {
                         string s = string.Empty;
                         for (int i = 0; i < possible_ways.Count() - 1; i++)
-                        { s += possible_ways[i].ToString() + " or "; }
-                        s += possible_ways[possible_ways.Count() - 1];
-                        throw new Exception("You have to move with " + s);
+                        {
+                            foreach (var step in possible_ways[i])
+                            {
+                                s += " -> " + step.ToString();
+                            }
+                            s += "\nor\n";
+                        }
+                        //ostatnia osobno 
+                        foreach (var step in possible_ways[possible_ways.Count() - 1])
+                        {
+                            s += " -> " + step.ToString();
+                        }
+                        throw new Exception("\nYou have to move like:\n" + s);
                     }
-                    if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
+                    else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
                     {
                         single_capturing_by_piece(ref work_board, origin, destination);
                     }
