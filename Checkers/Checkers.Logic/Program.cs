@@ -14,6 +14,7 @@ namespace Checkers.Logic
             try
             {
                 test_capturing_oponent_piece_by_multiple_pieces();
+                //test_capturing_multiple_oponents_pieces_by_one_piece();
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
@@ -51,10 +52,10 @@ namespace Checkers.Logic
         { Display_board_helper(game, color); }
         public static void Make_move_and_display_boards(ref Draughts_checkers game, int player_secret_key, Coordinates origin, Coordinates destination)
         {
-            game.Make_move(player_secret_key, origin, destination);
-            Console.WriteLine("\n\n" + origin.ToString() + " -> " + destination.ToString());
-            Display_board(game, game.Check_oponent_player());
             Display_board(game);
+            Console.WriteLine("\n" + origin.ToString() + " -> " + destination.ToString());
+            game.Make_move(player_secret_key, origin, destination);
+            Display_board(game, game.Check_oponent_player());
         }
 
         private static void test_change_man_to_king() //sprawdzic zamiane pionka na dame
@@ -141,14 +142,15 @@ namespace Checkers.Logic
 
             var black_key = game.Generate_player_key(false);
             Console.WriteLine("Black key: " + black_key);
-            Display_board(game, Color.White);
+            //Display_board(game, Color.White);
             //Display_board(game, Color.Black);
             Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(0, 5), new Coordinates(1, 4));
             Make_move_and_display_boards(ref game, white_key, new Coordinates(6, 5), new Coordinates(5, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             //Make_move_and_display_boards(ref game, white_key, new Coordinates(7, 6), new Coordinates(6, 5));//runs wrong way exception
-            Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));//not run exception
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(6, 3));
         }
     }
 }

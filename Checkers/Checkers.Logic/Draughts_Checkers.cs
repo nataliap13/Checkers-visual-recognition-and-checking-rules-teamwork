@@ -181,23 +181,23 @@ namespace Checkers.Logic
             {
                 //szukanie bicia dla pionka do przodu w lewo
                 List<List<Coordinates>> possible_ways = new List<List<Coordinates>>();
-                int number_of_captured_pieces = 0;
+                int length_of_capturing = 0;
                 for (int i = 0; i < _number_of_fields_in_row; i++)//row
                 {
                     for (int j = 0; j < _number_of_fields_in_row; j++)//column
                     {
                         List<Coordinates> destinations = new List<Coordinates>();
-                        int number_of_captured_pieces_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i), ref destinations);
-                        if (number_of_captured_pieces_for_this_piece == number_of_captured_pieces && number_of_captured_pieces > 0)
+                        int length_of_capturing_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i), ref destinations);
+                        if (length_of_capturing_for_this_piece == length_of_capturing && length_of_capturing > 0)
                         {
                             destinations.Reverse();
                             destinations.Add(new Coordinates(j, i));
                             destinations.Reverse();
                             possible_ways.Add(destinations);
                         }
-                        else if (number_of_captured_pieces_for_this_piece > number_of_captured_pieces)
+                        else if (length_of_capturing_for_this_piece > length_of_capturing)
                         {
-                            number_of_captured_pieces = number_of_captured_pieces_for_this_piece;
+                            length_of_capturing = length_of_capturing_for_this_piece;
                             possible_ways = new List<List<Coordinates>>();
                             destinations.Reverse();
                             destinations.Add(new Coordinates(j, i));
@@ -206,7 +206,7 @@ namespace Checkers.Logic
                         }
                     }
                 }
-                Console.WriteLine("\nZnaleziono " + number_of_captured_pieces + " bic z rzedu.");
+                Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
                 Console.WriteLine("Najdluzsze bicie/bicia mozna wykonac pionkami: ");
                 foreach (var way in possible_ways)
                 {
@@ -223,51 +223,43 @@ namespace Checkers.Logic
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
-                if (number_of_captured_pieces > 0)//bicie jest obowiazkowe
+                if (length_of_capturing > 0)//bicie jest obowiazkowe
                 {
                     List<Coordinates> chosen_way = new List<Coordinates>();//szukanie sciezki wybranej przez gracza
-                    foreach(var way in possible_ways)
+                    foreach (var way in possible_ways)
                     {
                         if ((way[0] == origin) && (way[1] == destination))
                         {
                             chosen_way = way;
                         }
                     }
-                    if(chosen_way.Count() == 0)
-                    //if (possible_ways.Exists(x => x.First() == origin) == false)//stare rozwiazanie ktore nie uwzglednialo destination
+                    if (chosen_way.Count() == 0)//exception
                     {
                         string s = string.Empty;
-                        for (int i = 0; i < possible_ways.Count() - 1; i++)
+                        foreach (var way in possible_ways)
                         {
-                            foreach (var step in possible_ways[i])
+                            foreach (var step in way)
                             {
                                 s += " -> " + step.ToString();
                             }
-                            s += "\nor\n";
+                            s += "\n";
                         }
-                        //ostatnia osobno 
-                        foreach (var step in possible_ways[possible_ways.Count() - 1])
-                        {
-                            s += " -> " + step.ToString();
-                        }
-                        throw new Exception("\nYou have to move like:\n" + s);
+                        throw new Exception("\nYou have to choose one of presented ways:\n" + s);
                     }
-                    else if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
+                    else//wlasciwe bicie
                     {
                         single_capturing_by_piece(ref work_board, origin, destination);
-                    }
-                    else
+                        if (length_of_capturing > 1)
+                        {
+                            Switch_player_turn_key();//zmiana aktywnego gracza. Na koncu sprawdzania zasad zawsze jest zamiana,
+                            //wiec poprzez podwojna zamiane, tura wroci na bijacego gracza i bedzie on miec dodatkowy ruch na bicie
+                        }
+                        else if(length_of_capturing == 1 && current_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
                     {
-                        string s = string.Empty;
-                        for (int i = 0; i < possible_ways.Count() - 1; i++)
-                        { s += possible_ways[i].ToString() + "or"; }
-                        s += possible_ways[possible_ways.Count() - 1];
-                        throw new Exception("You have to move with " + s);
+                            work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
+                            Set_board(Check_active_player(), work_board);
+                        }
                     }
-                    //jesli bilismy pionkiem i docieramy do bandy to trzeba zamienic pionka na dame ale tylko jesli nie bije on dalej pionka przeciwnika !!!!
-                    //todo to do
-                    //!!!!!!!!!!!!!!!!!!!!!!
-                    //!!!!!!!!!!!!!!!!!!!!!!
                 }
                 else if ((x_distance == 1 || x_distance == -1) && y_distance == -1)//przesuniecie pionka lub damy do przodu
                 {
@@ -293,10 +285,6 @@ namespace Checkers.Logic
                 else
                 { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
             }
-
-            //sprawdz czy jest oddalone tylko o 1 od bierzacego
-            //jesli nie to sprawdz czy na oddalonym o 1 jest pionek przeciwnika
-            //do something
             Switch_player_turn_key();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
         }
         private int find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin, ref List<Coordinates> destinations)//todo
