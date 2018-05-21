@@ -52,10 +52,10 @@ namespace Checkers.Logic
         { Display_board_helper(game, color); }
         public static void Make_move_and_display_boards(ref Draughts_checkers game, int player_secret_key, Coordinates origin, Coordinates destination)
         {
-            Display_board(game);
             Console.WriteLine("\n" + origin.ToString() + " -> " + destination.ToString());
             game.Make_move(player_secret_key, origin, destination);
-            Display_board(game, game.Check_oponent_player());
+            Display_board(game, game.Check_player_color(player_secret_key));
+            Display_board(game, game.Check_active_player());
         }
 
         private static void test_change_man_to_king() //sprawdzic zamiane pionka na dame
@@ -130,6 +130,7 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, black_key, new Coordinates(4, 5), new Coordinates(3, 4));
             Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(3, 4), new Coordinates(5, 2));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 2), new Coordinates(7, 4));
         }
 
         private static void test_capturing_oponent_piece_by_multiple_pieces() //sprawdzic zamiane pionka na dame
@@ -150,7 +151,7 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             //Make_move_and_display_boards(ref game, white_key, new Coordinates(7, 6), new Coordinates(6, 5));//runs wrong way exception
             Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));//not run exception
-            Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(6, 3));
+            //Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(6, 3));
         }
     }
 }

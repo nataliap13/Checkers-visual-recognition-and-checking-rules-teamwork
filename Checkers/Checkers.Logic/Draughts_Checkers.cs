@@ -54,7 +54,12 @@ namespace Checkers.Logic
                 }
             }
         }
-
+        public void Load_board(Checkers_piece[,] board, Color color)
+        {
+            if (color == Color.Black)
+            { board_black = board; }
+            else { board_black = Rotate_board(board); }
+        }
         public int Number_of_fields_in_row { get => _number_of_fields_in_row; }
         public int Number_of_pieces(Color color, Type type)
         {
@@ -69,8 +74,6 @@ namespace Checkers.Logic
             }
             return number_of_pieces;
         }
-        //private Checkers_piece[,] Board_Black { set => board_black = value; }
-        //private Checkers_piece[,] Board_White { set => board_black = Rotate_board(value); }
 
         public Checkers_piece[,] Get_board(Color color)//row,column
         {
@@ -117,7 +120,7 @@ namespace Checkers.Logic
             }
 
         }
-        private void Switch_player_turn_key()
+        private void Switch_player_turn()
         {
             if (_player_turn_key == _player_black_secret_key)
             { _player_turn_key = _player_white_secret_key; }
@@ -143,6 +146,16 @@ namespace Checkers.Logic
             { return true; }
             else
             { return false; }
+        }
+        public Color Check_player_color(int player_secret_key)
+        {
+            if (player_secret_key == _player_black_secret_key)
+            { return Color.Black; }
+
+            else if (player_secret_key == _player_white_secret_key)
+            { return Color.White; }
+            else
+            { throw new Exception("The player did not join yet!"); }
         }
         public Color Check_oponent_player()
         {
@@ -179,46 +192,48 @@ namespace Checkers.Logic
             { throw new Exception("Your are trying to move a piece to the white field!"); }
             //wlasciwa rozgrywka
             {
-                //szukanie bicia dla pionka do przodu w lewo
-                List<List<Coordinates>> possible_ways = new List<List<Coordinates>>();
+                //szukanie najdluzszych bic dla pionkow ktore to bicie oferuja
+                List<List<Coordinates>> all_the_longest_possible_ways = new List<List<Coordinates>>();
                 int length_of_capturing = 0;
                 for (int i = 0; i < _number_of_fields_in_row; i++)//row
                 {
                     for (int j = 0; j < _number_of_fields_in_row; j++)//column
                     {
-                        List<Coordinates> destinations = new List<Coordinates>();
-                        int length_of_capturing_for_this_piece = find_next_capture_for_this_piece(work_board, new Coordinates(j, i), ref destinations);
-                        if (length_of_capturing_for_this_piece == length_of_capturing && length_of_capturing > 0)
+                        var possible_ways_for_this_piece = Find_next_capture_for_this_piece(work_board, new Coordinates(j, i));
+                        if (possible_ways_for_this_piece.Count() > 0)
                         {
-                            destinations.Reverse();
-                            destinations.Add(new Coordinates(j, i));
-                            destinations.Reverse();
-                            possible_ways.Add(destinations);
-                        }
-                        else if (length_of_capturing_for_this_piece > length_of_capturing)
-                        {
-                            length_of_capturing = length_of_capturing_for_this_piece;
-                            possible_ways = new List<List<Coordinates>>();
-                            destinations.Reverse();
-                            destinations.Add(new Coordinates(j, i));
-                            destinations.Reverse();
-                            possible_ways.Add(destinations);
+                            foreach (var way in possible_ways_for_this_piece)
+                            {//dlugosc bicia jest o 1 krotsza od dlugosci sciezki, dlatego najpierw sprawdzamy a potem dodajemy poczatkowe wspolrzedne
+                                if (way.Count == length_of_capturing && length_of_capturing > 0)
+                                {
+                                    way.Reverse();
+                                    way.Add(new Coordinates(j, i));
+                                    way.Reverse();
+                                    all_the_longest_possible_ways.Add(way);
+                                }
+                                else if (way.Count() > length_of_capturing)
+                                {
+                                    length_of_capturing = way.Count();
+                                    all_the_longest_possible_ways = new List<List<Coordinates>>();
+                                    way.Reverse();
+                                    way.Add(new Coordinates(j, i));
+                                    way.Reverse();
+                                    all_the_longest_possible_ways.Add(way);
+                                }
+                            }
                         }
                     }
                 }
                 Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
-                Console.WriteLine("Najdluzsze bicie/bicia mozna wykonac pionkami: ");
-                foreach (var way in possible_ways)
+                Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
+                foreach (var way in all_the_longest_possible_ways)
                 {
-                    foreach (var jump in way)
+                    foreach (var step in way)
                     {
-                        Console.Write(" -> " + jump.ToString());
+                        Console.Write(" -> " + step.ToString());
                     }
-                    Console.WriteLine("\nlub");
+                    Console.Write("\n");
                 }
-                Console.WriteLine("Koniec opcji.");
-                //doto
-                //szukanie bicia dla damy
 
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
@@ -226,7 +241,7 @@ namespace Checkers.Logic
                 if (length_of_capturing > 0)//bicie jest obowiazkowe
                 {
                     List<Coordinates> chosen_way = new List<Coordinates>();//szukanie sciezki wybranej przez gracza
-                    foreach (var way in possible_ways)
+                    foreach (var way in all_the_longest_possible_ways)
                     {
                         if ((way[0] == origin) && (way[1] == destination))
                         {
@@ -236,7 +251,7 @@ namespace Checkers.Logic
                     if (chosen_way.Count() == 0)//exception
                     {
                         string s = string.Empty;
-                        foreach (var way in possible_ways)
+                        foreach (var way in all_the_longest_possible_ways)
                         {
                             foreach (var step in way)
                             {
@@ -248,14 +263,14 @@ namespace Checkers.Logic
                     }
                     else//wlasciwe bicie
                     {
-                        single_capturing_by_piece(ref work_board, origin, destination);
+                        Single_capturing_by_piece(ref work_board, origin, destination);
                         if (length_of_capturing > 1)
                         {
-                            Switch_player_turn_key();//zmiana aktywnego gracza. Na koncu sprawdzania zasad zawsze jest zamiana,
+                            Switch_player_turn();//zmiana aktywnego gracza. Na koncu sprawdzania zasad zawsze jest zamiana,
                             //wiec poprzez podwojna zamiane, tura wroci na bijacego gracza i bedzie on miec dodatkowy ruch na bicie
                         }
-                        else if(length_of_capturing == 1 && current_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
-                    {
+                        else if (length_of_capturing == 1 && current_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
+                        {
                             work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
                             Set_board(Check_active_player(), work_board);
                         }
@@ -285,101 +300,146 @@ namespace Checkers.Logic
                 else
                 { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
             }
-            Switch_player_turn_key();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
+            Switch_player_turn();//zmien aktywnego gracza na drugiego gracza jesli nie bylo bicia albo bylo to juz ostatnie mozliwe bicie
         }
-        private int find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin, ref List<Coordinates> destinations)//todo
+        //todo to do finish this
+        //!!!!!!!!!!!!!!!!!!!!!
+        private List<List<Coordinates>> Find_next_capture_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)
         {//jesli wykonano juz jedno bicie, to kolejne musi byc wykonane tym samym pionkiem
             try
             {
                 if (work_board[origin.Y, origin.X].Color == Check_active_player())
                 {
-                    int number_of_captured_pieces_1 = 0;
-                    int number_of_captured_pieces_2 = 0;
-                    int number_of_captured_pieces_3 = 0;
-                    int number_of_captured_pieces_4 = 0;
-                    Coordinates dest1 = new Coordinates(origin.X - 2, origin.Y - 2);
-                    Coordinates dest2 = new Coordinates(origin.X + 2, origin.Y - 2);
-                    Coordinates dest3 = new Coordinates(origin.X + 2, origin.Y + 2);
-                    Coordinates dest4 = new Coordinates(origin.X - 2, origin.Y + 2);
+                    var possible_ways = new List<List<Coordinates>>();
 
-                    try
+                    if (work_board[origin.Y, origin.X].Type == Type.Man)
                     {
-                        if ((work_board[origin.Y - 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X - 2] == null))
+                        Coordinates oponent1 = new Coordinates(origin.X - 1, origin.Y - 1);
+                        Coordinates oponent2 = new Coordinates(origin.X + 1, origin.Y - 1);
+                        Coordinates oponent3 = new Coordinates(origin.X + 1, origin.Y + 1);
+                        Coordinates oponent4 = new Coordinates(origin.X - 1, origin.Y + 1);
+                        List<Coordinates> oponents = new List<Coordinates>();
+                        oponents.Add(oponent1);
+                        oponents.Add(oponent2);
+                        oponents.Add(oponent3);
+                        oponents.Add(oponent4);
+
+                        Coordinates dest1 = new Coordinates(origin.X - 2, origin.Y - 2);
+                        Coordinates dest2 = new Coordinates(origin.X + 2, origin.Y - 2);
+                        Coordinates dest3 = new Coordinates(origin.X + 2, origin.Y + 2);
+                        Coordinates dest4 = new Coordinates(origin.X - 2, origin.Y + 2);
+                        List<Coordinates> dests = new List<Coordinates>();
+                        dests.Add(dest1);
+                        dests.Add(dest2);
+                        dests.Add(dest3);
+                        dests.Add(dest4);
+
+                        for (int i = 0; i < dests.Count(); i++)
                         {
-                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, dest1);//trzeba wykonac to bicie na kopii planszy
-                            List<Coordinates> unused_list = new List<Coordinates>();
-                            number_of_captured_pieces_1 = (1 + find_next_capture_for_this_piece(copy_of_board, dest1, ref unused_list));
+                            try
+                            {
+                                if ((work_board[oponents[i].Y, oponents[i].X].Color == Check_oponent_player()) && (work_board[dests[i].Y, dests[i].X] == null))
+                                {
+                                    //Console.WriteLine("\noponent: " + oponents[i].ToString());
+                                    //Console.WriteLine("dest: " + dests[i].ToString());
+                                    var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
+                                    copy_of_board = work_board.Clone() as Checkers_piece[,];
+                                    Single_capturing_by_piece(ref copy_of_board, origin, dests[i]);//trzeba wykonac to bicie na kopii planszy
+                                    var local_possible_ways = Find_next_capture_for_this_piece(copy_of_board, dests[i]);
+                                    //Console.WriteLine("Found " + local_possible_ways.Count());
+                                    if (local_possible_ways.Count() == 0)
+                                    {
+                                        var new_list = new List<Coordinates>();
+                                        new_list.Add(new Coordinates(dests[i].X, dests[i].Y));
+                                        local_possible_ways.Add(new_list);
+                                    }
+                                    else
+                                    {
+                                        foreach (var way in local_possible_ways)
+                                        {
+                                            way.Reverse();
+                                            way.Add(new Coordinates(dests[i].X, dests[i].Y));
+                                            way.Reverse();
+                                        }
+                                    }
+                                    possible_ways = possible_ways.Concat(local_possible_ways).ToList();
+                                }
+                            }
+                            catch (Exception e)
+                            { }
                         }
                     }
-                    catch (Exception e)
-                    { }
-
-                    try
-                    {
-                        if ((work_board[origin.Y - 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y - 2, origin.X + 2] == null))
+                    //dama todo, tylo przekopiowane mniej wiecej, ale nie moze tak sobie nadpisywac tej liczby magicznej
+                    else if (work_board[origin.Y, origin.X].Type == Type.King)
+                    {//dama moze bic po skosie i zatrzymac sie na dowlonym polu za pionkiem. Nie musi to byc pole bezposrednio za pionkiem.
+                        for (int i = 1; i < Number_of_fields_in_row; i++)//i to polozenie pionka/damy przeciwnika
                         {
-                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, dest2);//trzeba wykonac to bicie na kopii planszy
-                            List<Coordinates> unused_list = new List<Coordinates>();
-                            number_of_captured_pieces_2 = (1 + find_next_capture_for_this_piece(copy_of_board, dest2, ref unused_list));
+                            for (int j = i + 1; j < Number_of_fields_in_row; j++)//j to odleglosc pomiedzy polem zbijanego pionka a wolnym polem za zbijanym pionkiem/dama
+                            {
+                                try
+                                {
+                                    if ((work_board[origin.Y - i, origin.X - i].Color == Check_oponent_player()) && (work_board[origin.Y - j, origin.X - j] == null))
+                                    {
+                                    }
+                                }
+                                catch (Exception e)
+                                { }
+
+                                try
+                                {
+                                    if ((work_board[origin.Y - i, origin.X + i].Color == Check_oponent_player()) && (work_board[origin.Y - j, origin.X + j] == null))
+                                    {
+                                    }
+                                }
+                                catch (Exception e)
+                                { }
+
+                                try
+                                {
+                                    if ((work_board[origin.Y + i, origin.X + i].Color == Check_oponent_player()) && (work_board[origin.Y + j, origin.X + j] == null))
+                                    {
+                                    }
+                                }
+                                catch (Exception e)
+                                { }
+
+                                try
+                                {
+                                    if ((work_board[origin.Y + i, origin.X - i].Color == Check_oponent_player()) && (work_board[origin.Y + j, origin.X - j] == null))
+                                    {
+                                    }
+                                }
+                                catch (Exception e)
+                                { }
+                            }
                         }
                     }
-                    catch (Exception e)
-                    { }
-
-                    try
+                    else
+                    { throw new Exception("Something went wrong with piece type!"); }
+                    var final_possible_ways = new List<List<Coordinates>>();
+                    int final_length = 0;
+                    foreach (var way in possible_ways)
                     {
-                        if ((work_board[origin.Y + 1, origin.X + 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X + 2] == null))
+                        if (way.Count() == final_length)
                         {
-                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, dest3);//trzeba wykonac to bicie na kopii planszy
-                            List<Coordinates> unused_list = new List<Coordinates>();
-                            number_of_captured_pieces_3 = (1 + find_next_capture_for_this_piece(copy_of_board, dest3, ref unused_list));
+                            final_possible_ways.Add(way);
+                        }
+                        else if (way.Count() > final_length)
+                        {
+                            final_possible_ways = new List<List<Coordinates>>();
+                            final_possible_ways.Add(way);
                         }
                     }
-                    catch (Exception e)
-                    { }
-
-                    try
-                    {
-                        if ((work_board[origin.Y + 1, origin.X - 1].Color == Check_oponent_player()) && (work_board[origin.Y + 2, origin.X - 2] == null))
-                        {
-                            var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
-                            copy_of_board = work_board.Clone() as Checkers_piece[,];
-                            single_capturing_by_piece(ref copy_of_board, origin, dest4);//trzeba wykonac to bicie na kopii planszy
-                            List<Coordinates> unused_list = new List<Coordinates>();
-                            number_of_captured_pieces_4 = (1 + find_next_capture_for_this_piece(copy_of_board, dest4, ref unused_list));
-                        }
-                    }
-                    catch (Exception e)
-                    { }
-                    int max = Math.Max(number_of_captured_pieces_1, (Math.Max(number_of_captured_pieces_2, Math.Max(number_of_captured_pieces_3, number_of_captured_pieces_4))));
-
-                    if (number_of_captured_pieces_1 == max)
-                    { destinations.Add(dest1); }
-                    if (number_of_captured_pieces_2 == max)
-                    { destinations.Add(dest2); }
-                    if (number_of_captured_pieces_3 == max)
-                    { destinations.Add(dest3); }
-                    if (number_of_captured_pieces_4 == max)
-                    { destinations.Add(dest4); }
-                    //todo
-                    //trzeba sprawdzic, czy dwie drogi nie sa rownie dlugie. Jesli tak to oba pierwsze ruchy musza być dozwolone
-                    return max;
+                    return final_possible_ways;
                 }
                 else
                 { throw new Exception("Something went wrong!"); }
             }
             catch (Exception e)
             { }
-            return 0;
+            return new List<List<Coordinates>>();
         }
-        //tode
-        private void single_capturing_by_piece(ref Checkers_piece[,] work_board, Coordinates origin, Coordinates destination)
+        private void Single_capturing_by_piece(ref Checkers_piece[,] work_board, Coordinates origin, Coordinates destination)//changes a work_board!
         {
             var current_piece = work_board[origin.Y, origin.X];
             //odleglosc wraz ze znakiem zwrotu/kierunku
@@ -399,38 +459,39 @@ namespace Checkers.Logic
 
                 work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
                 Set_board(Check_active_player(), work_board);
-                if (current_piece.Type == Type.Man && destination.Y == 0)
-                { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }//to bedzie trzeba zmienic bo jesli jest dalsze bicie to tego nie ma!!!!!!!!!!!!
-                //!!!!!!!!!!!!
-                //todo
-                //jezeli sa mozliwe kolejne bicia to ten gracz ma kolejny ruch
-                //!!!!!!!!!!!!!!!!!!
+                var possible_ways = Find_next_capture_for_this_piece(work_board, origin);
+
+                if (current_piece.Type == Type.Man && destination.Y == 0 && (possible_ways.Count() == 0))//jesli nie ma dalszego bicia to pionek sie zmienia na dame
+                { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }
             }
             else
             { throw new Exception("Capturing is not allowed right now!"); }
         }
-        //private void Display_board_helper(Checkers_piece[,] board, Color color)
-        //{
-        //    Console.Write("\n---");
-        //    for (int i = 0; i < _number_of_fields_in_row; i++)
-        //    { Console.Write(i + " "); }
 
-        //    for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
-        //    {
-        //        Console.Write("\n" + i + ". ");
-        //        for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
-        //        {
-        //            if (board[i, j] == null)
-        //            { Console.Write("= "); }
-        //            //{ Console.Write("# "); }
-        //            else
-        //            { Console.Write(board[i, j].ToString() + " "); }
-        //        }
-        //    }
-        //    Console.Write("\n---");
-        //    for (int i = 0; i < _number_of_fields_in_row; i++)
-        //    { Console.Write(i + " "); }
-        //    Console.Write(color + "\n");
-        //}
+        //todo to do ta funkcja ponizej
+        private void Single_capturing_by_king() { }
+        /*private void Display_board_helper(Checkers_piece[,] board, Color color)
+        {
+            Console.Write("\n---");
+            for (int i = 0; i < _number_of_fields_in_row; i++)
+            { Console.Write(i + " "); }
+
+            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
+            {
+                Console.Write("\n" + i + ". ");
+                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
+                {
+                    if (board[i, j] == null)
+                    { Console.Write("= "); }
+                    //{ Console.Write("# "); }
+                    else
+                    { Console.Write(board[i, j].ToString() + " "); }
+                }
+            }
+            Console.Write("\n---");
+            for (int i = 0; i < _number_of_fields_in_row; i++)
+            { Console.Write(i + " "); }
+            Console.Write(color + "\n");
+        }*/
     }
 }
