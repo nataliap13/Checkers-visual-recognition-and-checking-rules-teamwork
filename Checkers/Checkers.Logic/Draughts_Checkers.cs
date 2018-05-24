@@ -234,7 +234,7 @@ namespace Checkers.Logic
                     }
                     Console.Write("\n");
                 }
-
+                
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
@@ -264,6 +264,8 @@ namespace Checkers.Logic
                     else//wlasciwe bicie
                     {
                         Single_capturing_by_piece(ref work_board, origin, destination);
+                        Set_board(Check_active_player(), work_board);
+
                         if (length_of_capturing > 1)
                         {
                             Switch_player_turn();//zmiana aktywnego gracza. Na koncu sprawdzania zasad zawsze jest zamiana,
@@ -289,14 +291,10 @@ namespace Checkers.Logic
                 }
                 else if ((x_distance == y_distance) && current_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
                 {
-                    //trzeba sprawdzic czy po drodze nie ma pionka przeciwnika ktory mozna zbic
-                    //jesli na drodze jest nasz pionek to ruch nie moze zostac wykonany
-                    //todo to do
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
                     Set_board(Check_active_player(), work_board);
                 }
-                //czy jest bicie
                 else
                 { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
             }
@@ -336,8 +334,7 @@ namespace Checkers.Logic
             { }
             return possible_ways;
         }
-        //todo to do
-        //poprawic bicie damy
+
         private List<List<Coordinates>> Get_the_longest_capturings_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)
         {
             string name_of_function = "Get_the_longest_capturings_for_this_piece";
@@ -377,11 +374,6 @@ namespace Checkers.Logic
                     }
                     else if (work_board[origin.Y, origin.X].Type == Type.King)
                     {//dama moze bic po skosie i zatrzymac sie na dowlonym polu za pionkiem. Nie musi to byc pole bezposrednio za pionkiem.
-                        //uwaga
-                        //jesli jest dama, potem pionek przeciwnika i drugi pionek przeciwnika za nim to bicie nie jest mozliwe
-                        //przeszukiwanie odbywa sie az nie wyjdziemy za kraniec planszy(exception) lub nie natkniemy sie na inny pionek przeciwnika po tej przekatnej
-                        //jesli natkniemy sie na 2 pionek przeciwnika na tej samej przekatnej, nie szukamy dalej po tej przekatnej
-                        //to bardzo wazne
                         for (int i = 1; i < Number_of_fields_in_row; i++)//i to odleglosc pomiedzy nasza dama a zbijanym pionkiem/dama przeciwnika
                         {
                             for (int j = i + 1; j < Number_of_fields_in_row; j++)//j to odleglosc pomiedzy polem naszej damy, a wolnym polem za zbijanym pionkiem/dama
@@ -396,6 +388,7 @@ namespace Checkers.Logic
                                 oponents.Add(oponent3);
                                 oponents.Add(oponent4);
 
+
                                 Coordinates dest1 = new Coordinates(origin.X - j, origin.Y - j);
                                 Coordinates dest2 = new Coordinates(origin.X + j, origin.Y - j);
                                 Coordinates dest3 = new Coordinates(origin.X + j, origin.Y + j);
@@ -406,10 +399,50 @@ namespace Checkers.Logic
                                 dests.Add(dest3);
                                 dests.Add(dest4);
 
+                                //trzeba sprawdzic czy pomiedzy dama a pionkiem przeciwnika wszystkie pola sa wolne
+                                //trzeba sprawdzic czy pomiedzy pionkiem przeciwnika a miejscem odlozenia damy tez wszystkie pola sa wolne
+                                //ponizsze zmienne okreslaja czy od damy do zbijanego pionka, oraz czy od zbijanego pionka do pola destination wszystkie inne pola sa puste
+                                //jesli nie, czyli po drodze jest jakis przeszkadzajacy pionek, to nie rozwazamy takiej sciezki bicia
+                                bool empty_fields_to_oponent1 = true;
+                                bool empty_fields_to_oponent2 = true;
+                                bool empty_fields_to_oponent3 = true;
+                                bool empty_fields_to_oponent4 = true;
+                                List<bool> empty_fields_to_oponents = new List<bool>();
+                                empty_fields_to_oponents.Add(empty_fields_to_oponent1);
+                                empty_fields_to_oponents.Add(empty_fields_to_oponent2);
+                                empty_fields_to_oponents.Add(empty_fields_to_oponent3);
+                                empty_fields_to_oponents.Add(empty_fields_to_oponent4);
+
+                                for (var d = 1; d < i; d++)//d is distandce_from_king_to_empty_field // d = 1 bo zaczynamy 1 pole dalej niz pole origin
+                                {
+                                    if (work_board[origin.Y - d, origin.X - d] != null)
+                                    { empty_fields_to_oponent1 = false; }
+                                    if (work_board[origin.Y - d, origin.X + d] != null)
+                                    { empty_fields_to_oponent2 = false; }
+                                    if (work_board[origin.Y + d, origin.X + d] != null)
+                                    { empty_fields_to_oponent3 = false; }
+                                    if (work_board[origin.Y + d, origin.X - d] != null)
+                                    { empty_fields_to_oponent4 = false; }
+                                }
+                                for (var d = i + 1; d < j; d++)//d is distandce_from oponent piece_to_empty_field // d = i + 1 bo zaczynamy jedno pole dalej niz stoi przeciwnik
+                                {
+                                    if (work_board[origin.Y - d, origin.X - d] != null)
+                                    { empty_fields_to_oponent1 = false; }
+                                    if (work_board[origin.Y - d, origin.X + d] != null)
+                                    { empty_fields_to_oponent2 = false; }
+                                    if (work_board[origin.Y + d, origin.X + d] != null)
+                                    { empty_fields_to_oponent3 = false; }
+                                    if (work_board[origin.Y + d, origin.X - d] != null)
+                                    { empty_fields_to_oponent4 = false; }
+                                }
+
                                 for (int k = 0; k < dests.Count(); k++)
                                 {
-                                    var single_iteration_possible_ways = Find_the_longest_capturings_for_this_piece_and_oponent_and_destination(work_board, origin, oponents[k], dests[k]);
-                                    possible_ways = possible_ways.Concat(single_iteration_possible_ways).ToList();
+                                    if (empty_fields_to_oponents[k] == true)
+                                    {
+                                        var single_iteration_possible_ways = Find_the_longest_capturings_for_this_piece_and_oponent_and_destination(work_board, origin, oponents[k], dests[k]);
+                                        possible_ways = possible_ways.Concat(single_iteration_possible_ways).ToList();
+                                    }
                                 }
                             }
                         }
@@ -440,13 +473,6 @@ namespace Checkers.Logic
             return new List<List<Coordinates>>();
         }
 
-        //!!!!!!!!!!!!!!!!!!!!!
-        //to do todo zrobic sprawdzenie bicia dla damy
-        //!!!!!!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!!!!!!
-        //todo to do przetestowac to!!!!
-        //!!!!!!!!!!!!!!!!!!!!!
-
         private void Single_capturing_by_piece(ref Checkers_piece[,] work_board, Coordinates origin, Coordinates destination)//changes a work_board!
         {
             string name_of_function = "Single_capturing_by_piece";
@@ -463,14 +489,12 @@ namespace Checkers.Logic
                     work_board[origin.Y, origin.X] = null;
                     var oponent_piece_coords = new Coordinates((destination.X - x_distance / 2), (destination.Y - y_distance / 2));
                     var oponent_piece = work_board[oponent_piece_coords.Y, oponent_piece_coords.X];
-                    if (Check_oponent_player() == oponent_piece.Color)
-                    { }
-                    else
+                    if (Check_oponent_player() != oponent_piece.Color)
                     { throw new Exception("Your are trying to jump over your own piece!"); }
 
                     work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
-                    Set_board(Check_active_player(), work_board);
-                    var possible_ways = Get_the_longest_capturings_for_this_piece(work_board, origin);
+
+                    var possible_ways = Get_the_longest_capturings_for_this_piece(work_board, destination);
 
                     if (current_piece.Type == Type.Man && destination.Y == 0 && (possible_ways.Count() == 0))//jesli nie ma dalszego bicia to pionek sie zmienia na dame
                     { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }
@@ -486,8 +510,9 @@ namespace Checkers.Logic
 
         }
 
-        /*private void Display_board_helper(Checkers_piece[,] board, Color color)
+        private void Display_board_helper(Checkers_piece[,] board, Color color)
         {
+            Console.WriteLine("Display_board_helper");
             Console.Write("\n---");
             for (int i = 0; i < _number_of_fields_in_row; i++)
             { Console.Write(i + " "); }
@@ -508,6 +533,7 @@ namespace Checkers.Logic
             for (int i = 0; i < _number_of_fields_in_row; i++)
             { Console.Write(i + " "); }
             Console.Write(color + "\n");
-        }*/
+            Console.WriteLine("Display_board_helper END!");
+        }
     }
 }

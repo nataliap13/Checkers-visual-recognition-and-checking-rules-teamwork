@@ -13,8 +13,11 @@ namespace Checkers.Logic
         {
             try
             {
-                test_capturing_oponent_piece_by_multiple_pieces();
+                //test_capturing_oponent_piece_by_multiple_pieces();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
+                //test_change_man_to_king_and_capturings();
+                test_change_man_to_king();
+                //test_NOT_change_man_to_king_and_capturings();
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
@@ -58,7 +61,7 @@ namespace Checkers.Logic
             Display_board(game, game.Check_active_player());
         }
 
-        private static void test_change_man_to_king() //sprawdzic zamiane pionka na dame
+        private static void test_change_man_to_king()
         {
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
@@ -68,32 +71,16 @@ namespace Checkers.Logic
 
             var black_key = game.Generate_player_key(false);
             Console.WriteLine("Black key: " + black_key);
-            Display_board(game, Color.White);
+            //Display_board(game, Color.White);
             //Display_board(game, Color.Black);
-            Coordinates f1 = new Coordinates(0, 5);
-            Coordinates f2 = new Coordinates(1, 4);
-            Coordinates f3 = new Coordinates(2, 3);
-            Coordinates f4 = new Coordinates(3, 2);
-            Coordinates f5 = new Coordinates(4, 1);
-            Coordinates f6 = new Coordinates(5, 0);
-            game.Make_move(white_key, f1, f2);
-            game.Make_move(black_key, new Coordinates(4, 5), new Coordinates(3, 4));
-            game.Make_move(white_key, f2, f3);
-            game.Make_move(black_key, new Coordinates(2, 5), new Coordinates(1, 4));
-            game.Make_move(white_key, f3, f4);
-            game.Make_move(black_key, new Coordinates(3, 6), new Coordinates(2, 5));
-            game.Make_move(white_key, f4, f5);
-            game.Make_move(black_key, new Coordinates(3, 4), new Coordinates(4, 3));
-            game.Make_move(white_key, new Coordinates(2, 5), f2);
-            game.Make_move(black_key, new Coordinates(2, 5), new Coordinates(3, 4));
-            game.Make_move(white_key, f2, new Coordinates(0, 3));
-            game.Make_move(black_key, new Coordinates(1, 6), new Coordinates(2, 5));
-            game.Make_move(white_key, new Coordinates(6, 5), new Coordinates(5, 4));
-            game.Make_move(black_key, new Coordinates(2, 7), new Coordinates(1, 6));
-            game.Make_move(white_key, f5, f6);
-            Display_board(game, Color.White);
+            Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            board[1, 6] = new Checkers_piece(Color.White, Type.Man);
+            game.Load_board(board, Color.White);
+
+            Display_board(game);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(6, 1), new Coordinates(5, 0));
         }
-        private static void test_capturing_oponents_piece() //sprawdzic zamiane pionka na dame
+        private static void test_capturing_oponents_piece()
         {
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
@@ -112,7 +99,7 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(7, 2));
         }
-        private static void test_capturing_multiple_oponents_pieces_by_one_piece() //sprawdzic zamiane pionka na dame
+        private static void test_capturing_multiple_oponents_pieces_by_one_piece()
         {
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
@@ -132,8 +119,7 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, black_key, new Coordinates(3, 4), new Coordinates(5, 2));
             Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 2), new Coordinates(7, 4));
         }
-
-        private static void test_capturing_oponent_piece_by_multiple_pieces() //sprawdzic zamiane pionka na dame
+        private static void test_capturing_oponent_piece_by_multiple_pieces()
         {
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
@@ -153,5 +139,31 @@ namespace Checkers.Logic
             Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 4), new Coordinates(7, 2));//not run exception
             //Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 4), new Coordinates(6, 3));
         }
+        private static void test_NOT_change_man_to_king_and_capturings()
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(true);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(false);
+            Console.WriteLine("Black key: " + black_key);
+
+            Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            board[2, 7] = new Checkers_piece(Color.White, Type.Man);
+            board[1, 6] = new Checkers_piece(Color.Black, Type.Man);
+            board[1, 4] = new Checkers_piece(Color.Black, Type.Man);
+            game.Load_board(board, Color.White);
+
+            Display_board(game);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(7, 2), new Coordinates(5, 0));
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(5, 0), new Coordinates(3, 2));
+        }
+        private static void test_capturing_multiple_oponents_pieces_by_one_king()
+        {
+
+        }
+        //sprawdzic czy jesli pionek ma wiele bic i odbija sie od bandy to czy nie zostanie zamieniony na dame
     }
 }
