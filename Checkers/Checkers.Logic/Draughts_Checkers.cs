@@ -331,6 +331,15 @@ namespace Checkers.Logic
                             way.Reverse();
                         }
                     }
+                    //Console.WriteLine("Znaleziono takie drogi");
+                    //foreach (var way in local_possible_ways)
+                    //{
+                    //    foreach (var step in way)
+                    //    {
+                    //        Console.Write(" -> " + step.ToString());
+                    //    }
+                    //}
+                    //Console.WriteLine("");
                     possible_ways = possible_ways.Concat(local_possible_ways).ToList();
                 }
             }
@@ -521,6 +530,15 @@ namespace Checkers.Logic
                     { throw new Exception("Something went wrong with piece type in " + name_of_function + "!"); }
                     var final_possible_ways = new List<List<Coordinates>>();
                     int final_length = 0;
+                    //Console.WriteLine("Possible ways wygląda tak: ");
+
+                    //foreach (var way in possible_ways)
+                    //{
+                    //    foreach (var step in way)
+                    //    { Console.Write(" -> " + step.ToString()); }
+                    //    Console.WriteLine("");
+                    //}
+
                     foreach (var way in possible_ways)
                     {
                         if (way.Count() == final_length)
@@ -531,6 +549,7 @@ namespace Checkers.Logic
                         {
                             final_possible_ways = new List<List<Coordinates>>();
                             final_possible_ways.Add(way);
+                            final_length = way.Count();//tu dodalam te linijke
                         }
                     }
                     return final_possible_ways;
@@ -580,7 +599,7 @@ namespace Checkers.Logic
                 work_board[origin.Y, origin.X] = null;
 
                 var x_distance = destination.X - origin.X;
-                if(x_distance<0)
+                if (x_distance < 0)
                 { x_distance *= -1; }
 
                 //wynulowanie zbijanego pionka
