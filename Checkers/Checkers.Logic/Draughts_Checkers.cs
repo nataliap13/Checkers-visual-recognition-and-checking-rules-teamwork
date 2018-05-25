@@ -234,7 +234,7 @@ namespace Checkers.Logic
                     }
                     Console.Write("\n");
                 }
-                
+
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
@@ -311,7 +311,11 @@ namespace Checkers.Logic
                     var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                     copy_of_board = work_board.Clone() as Checkers_piece[,];
                     Single_capturing_by_piece(ref copy_of_board, origin, dest);//trzeba wykonac to bicie na kopii planszy
+                    //Console.WriteLine("Zaczynam szukac kolejnych bic po zbiciu przeciwnika " + oponent.ToString() + " i destination " + dest.ToString());
+                    //Console.WriteLine("Teraz plansza wygląda tak");
+                    //Display_board_helper(copy_of_board, Color.White);
                     var local_possible_ways = Get_the_longest_capturings_for_this_piece(copy_of_board, dest);
+                    //Console.WriteLine("local_possible_ways.Count() = " + local_possible_ways.Count());
                     if (local_possible_ways.Count() == 0)
                     {
                         var new_list = new List<Coordinates>();
@@ -376,8 +380,10 @@ namespace Checkers.Logic
                     {//dama moze bic po skosie i zatrzymac sie na dowlonym polu za pionkiem. Nie musi to byc pole bezposrednio za pionkiem.
                         for (int i = 1; i < Number_of_fields_in_row; i++)//i to odleglosc pomiedzy nasza dama a zbijanym pionkiem/dama przeciwnika
                         {
+                            //Console.WriteLine("i = " + i);
                             for (int j = i + 1; j < Number_of_fields_in_row; j++)//j to odleglosc pomiedzy polem naszej damy, a wolnym polem za zbijanym pionkiem/dama
                             {
+                                //Console.WriteLine("j = " + j);
                                 Coordinates oponent1 = new Coordinates(origin.X - i, origin.Y - i);
                                 Coordinates oponent2 = new Coordinates(origin.X + i, origin.Y - i);
                                 Coordinates oponent3 = new Coordinates(origin.X + i, origin.Y + i);
@@ -387,6 +393,8 @@ namespace Checkers.Logic
                                 oponents.Add(oponent2);
                                 oponents.Add(oponent3);
                                 oponents.Add(oponent4);
+                                //foreach (var x in oponents)
+                                //{ Console.WriteLine("Czy jest przeciwnik na " + x); }
 
 
                                 Coordinates dest1 = new Coordinates(origin.X - j, origin.Y - j);
@@ -415,24 +423,83 @@ namespace Checkers.Logic
 
                                 for (var d = 1; d < i; d++)//d is distandce_from_king_to_empty_field // d = 1 bo zaczynamy 1 pole dalej niz pole origin
                                 {
-                                    if (work_board[origin.Y - d, origin.X - d] != null)
+                                    try
+                                    {
+                                        if (work_board[origin.Y - d, origin.X - d] != null)
+                                        {
+                                            empty_fields_to_oponent1 = false;
+                                            //Console.WriteLine("11 Pole " + (origin.X - d) + "," + (origin.Y - d) + " nie jest puste dla przeciwnika na " + oponent1.ToString());
+                                        }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent1 = false; }
-                                    if (work_board[origin.Y - d, origin.X + d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y - d, origin.X + d] != null)
+                                        { empty_fields_to_oponent2 = false; }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent2 = false; }
-                                    if (work_board[origin.Y + d, origin.X + d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y + d, origin.X + d] != null)
+                                        {
+                                            empty_fields_to_oponent3 = false;
+                                            //Console.WriteLine("13 Pole " + (origin.X + d) + "," + (origin.Y + d) + " nie jest puste dla przeciwnika na " + oponent3.ToString());
+                                        }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent3 = false; }
-                                    if (work_board[origin.Y + d, origin.X - d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y + d, origin.X - d] != null)
+                                        { empty_fields_to_oponent4 = false; }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent4 = false; }
                                 }
                                 for (var d = i + 1; d < j; d++)//d is distandce_from oponent piece_to_empty_field // d = i + 1 bo zaczynamy jedno pole dalej niz stoi przeciwnik
                                 {
-                                    if (work_board[origin.Y - d, origin.X - d] != null)
+                                    try
+                                    {
+                                        if (work_board[origin.Y - d, origin.X - d] != null)
+                                        {
+                                            empty_fields_to_oponent1 = false;
+                                            //Console.WriteLine("21 Pole " + (origin.X - d) + "," + (origin.Y - d) + " nie jest puste dla przeciwnika na " + oponent1.ToString());
+                                        }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent1 = false; }
-                                    if (work_board[origin.Y - d, origin.X + d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y - d, origin.X + d] != null)
+                                        { empty_fields_to_oponent2 = false; }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent2 = false; }
-                                    if (work_board[origin.Y + d, origin.X + d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y + d, origin.X + d] != null)
+                                        {
+                                            empty_fields_to_oponent3 = false;
+                                            //Console.WriteLine("23 Pole " + (origin.X + d) + "," + (origin.Y + d) + " nie jest puste dla przeciwnika na " + oponent3.ToString());
+                                        }
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent3 = false; }
-                                    if (work_board[origin.Y + d, origin.X - d] != null)
+
+                                    try
+                                    {
+                                        if (work_board[origin.Y + d, origin.X - d] != null)
+                                        { empty_fields_to_oponent4 = false; }
+
+                                    }
+                                    catch (Exception)
                                     { empty_fields_to_oponent4 = false; }
                                 }
 
@@ -444,7 +511,10 @@ namespace Checkers.Logic
                                         possible_ways = possible_ways.Concat(single_iteration_possible_ways).ToList();
                                     }
                                 }
+                                //Console.WriteLine("END j = " + j);
                             }
+                            //Console.WriteLine("END i = " + i);
+                            //Console.WriteLine("END Number_of_fields_in_row = " + Number_of_fields_in_row);
                         }
                     }
                     else
@@ -503,7 +573,48 @@ namespace Checkers.Logic
                 { throw new Exception("Capturing is not allowed right now!"); }
             }
             else if (work_board[origin.Y, origin.X].Type == Type.King)
-            {//trzeba poszukac czy po drodze jest pionek i co najmniej jedno pole za nim wolne
+            {
+                //Console.WriteLine("Przed zbiciem");
+                //Display_board_helper(work_board, Color.White);
+                work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
+                work_board[origin.Y, origin.X] = null;
+
+                var x_distance = destination.X - origin.X;
+                if(x_distance<0)
+                { x_distance *= -1; }
+
+                //wynulowanie zbijanego pionka
+                //wczesniej bylo sprawdzone czy po drodze nie ma zadnych innych pionkow
+                //wiec mozna nie szukac zbijanego pionka tylko po prostu wpisac null na kazde pole
+                //Console.WriteLine("x_distance = " + x_distance);
+                for (int i = 1; i < x_distance; i++)
+                {
+                    if (destination.X > origin.X && destination.Y > origin.Y)
+                    {
+                        work_board[origin.Y + i, origin.X + i] = null;
+                        //Console.WriteLine("Null na " + (origin.X + i) + "," + (origin.Y + i));
+                    }
+                    else if (destination.X < origin.X && destination.Y > origin.Y)
+                    {
+                        work_board[origin.Y + i, origin.X - i] = null;
+                        //Console.WriteLine("Null na " + (origin.X - i) + "," + (origin.Y + i));
+                    }
+                    else if (destination.X > origin.X && destination.Y < origin.Y)
+                    {
+                        work_board[origin.Y - i, origin.X + i] = null;
+                        //Console.WriteLine("Null na " + (origin.X + i) + "," + (origin.Y - i));
+                    }
+                    else if (destination.X < origin.X && destination.Y < origin.Y)
+                    {
+                        work_board[origin.Y - i, origin.X - i] = null;
+                        //Console.WriteLine("Null na " + (origin.X - i) + "," + (origin.Y - i));
+                    }
+                }
+
+                //var possible_ways = Get_the_longest_capturings_for_this_piece(work_board, destination);
+
+                //Console.WriteLine("Po zbiciu");
+                //Display_board_helper(work_board, Color.White);
             }
             else
             { throw new Exception("Something went wrong with piece type in " + name_of_function + "!"); }

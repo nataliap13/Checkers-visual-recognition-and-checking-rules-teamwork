@@ -13,11 +13,12 @@ namespace Checkers.Logic
         {
             try
             {
-                //test_capturing_oponent_piece_by_multiple_pieces();
+                //test_change_man_to_king();
+                //test_capturing_oponents_piece();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
-                //test_change_man_to_king_and_capturings();
-                test_change_man_to_king();
+                //test_capturing_oponent_piece_by_multiple_pieces();
                 //test_NOT_change_man_to_king_and_capturings();
+                test_capturing_multiple_oponents_pieces_by_one_king();
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
@@ -71,8 +72,6 @@ namespace Checkers.Logic
 
             var black_key = game.Generate_player_key(false);
             Console.WriteLine("Black key: " + black_key);
-            //Display_board(game, Color.White);
-            //Display_board(game, Color.Black);
             Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
             board[1, 6] = new Checkers_piece(Color.White, Type.Man);
             game.Load_board(board, Color.White);
@@ -162,7 +161,22 @@ namespace Checkers.Logic
         }
         private static void test_capturing_multiple_oponents_pieces_by_one_king()
         {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(true);
+            Console.WriteLine("White key: " + white_key);
 
+            var black_key = game.Generate_player_key(false);
+            Console.WriteLine("Black key: " + black_key);
+            Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            board[4, 3] = new Checkers_piece(Color.White, Type.King);
+            board[3, 2] = new Checkers_piece(Color.Black, Type.Man);
+            board[6, 5] = new Checkers_piece(Color.Black, Type.Man);
+            game.Load_board(board, Color.White);
+
+            Display_board(game);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(2, 5));//runs exception
         }
         //sprawdzic czy jesli pionek ma wiele bic i odbija sie od bandy to czy nie zostanie zamieniony na dame
     }
