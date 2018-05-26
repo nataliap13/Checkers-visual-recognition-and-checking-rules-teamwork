@@ -13,10 +13,12 @@ namespace Checkers.Logic
         private int _player_black_secret_key = 0;
         private int _player_white_secret_key = 0;
         private int _player_turn_key;
+        private int _number_of_pieces_per_player;
         private Random _rand = new Random();
 
         public Draughts_checkers(int number_of_fields_in_row_, int number_of_pieces_per_player)
         {
+            _number_of_pieces_per_player = number_of_pieces_per_player;
             if (number_of_pieces_per_player >= (number_of_fields_in_row_ * number_of_fields_in_row_ / 4))
             {
                 throw new Exception("To many pieces per player.");
@@ -54,13 +56,9 @@ namespace Checkers.Logic
                 }
             }
         }
-        public void Load_board(Checkers_piece[,] board, Color color)
-        {
-            if (color == Color.Black)
-            { board_black = board; }
-            else { board_black = Rotate_board(board); }
-        }
         public int Number_of_fields_in_row { get => _number_of_fields_in_row; }
+        public int Number_of_pieces_per_player { get => _number_of_pieces_per_player; }
+
         public int Number_of_pieces(Color color, Type type)
         {
             int number_of_pieces = 0;
@@ -75,19 +73,28 @@ namespace Checkers.Logic
             return number_of_pieces;
         }
 
-        public Checkers_piece[,] Get_board(Color color)//row,column
+        public Checkers_piece[,] Get_copy_of_board(Color color)
         {
             if (color == Color.Black)
-            { return board_black; }
+            {
+                var copy_of_board_black = board_black.Clone() as Checkers_piece[,];
+                return copy_of_board_black;
+            }
             else
             { return Rotate_board(board_black); }
         }
-        private void Set_board(Color color, Checkers_piece[,] new_board)//row,column
+        public void Set_board(Color active_player_color, Checkers_piece[,] board)
         {
-            if (color == Color.Black)
-            { board_black = new_board; }
+            if(Check_active_player() != active_player_color)
+            { Switch_player_turn(); }
+
+            if (active_player_color == Color.Black)
+            {
+                var copy_of_board_black = board.Clone() as Checkers_piece[,];
+                board_black = copy_of_board_black;
+            }
             else
-            { board_black = Rotate_board(new_board); }
+            { board_black = Rotate_board(board); }
         }
         private Checkers_piece[,] Rotate_board(Checkers_piece[,] board_to_rotate)
         {
@@ -103,32 +110,22 @@ namespace Checkers.Logic
             return board_rotated;
         }
 
-        public int Generate_player_key(bool is_player_white)
+        public int Generate_player_key(Color color)
         {
-            if (_player_white_secret_key == 0 && is_player_white == true)
+            if (_player_white_secret_key == 0 && color == Color.White)
             {
                 _player_turn_key = _player_white_secret_key = _rand.Next(10000, 32000);
                 return _player_white_secret_key;
             }
-            else if (_player_black_secret_key == 0 && is_player_white == false)
+            else if (_player_black_secret_key == 0 && color == Color.Black)
             {
                 return _player_black_secret_key = _rand.Next(10000, 32000);
             }
             else
             {
-                throw new Exception("Player already exists!");
+                throw new Exception("Player " + color + " already exists!");
             }
 
-        }
-        private void Switch_player_turn()
-        {
-            if (_player_turn_key == _player_black_secret_key)
-            { _player_turn_key = _player_white_secret_key; }
-
-            else if (_player_turn_key == _player_white_secret_key)
-            { _player_turn_key = _player_black_secret_key; }
-            else
-            { throw new Exception("Unexpected Switch_player_turn_key exception!"); };
         }
         public Color Check_active_player()
         {
@@ -167,6 +164,16 @@ namespace Checkers.Logic
             else
             { throw new Exception("The player did not join yet!"); }
         }
+        private void Switch_player_turn()
+        {
+            if (_player_turn_key == _player_black_secret_key)
+            { _player_turn_key = _player_white_secret_key; }
+
+            else if (_player_turn_key == _player_white_secret_key)
+            { _player_turn_key = _player_black_secret_key; }
+            else
+            { throw new Exception("Unexpected Switch_player_turn_key exception!"); };
+        }
 
         public void Make_move(int player_secret_key, Coordinates origin, Coordinates destination)//int is error code, to be implemented
         {
@@ -176,7 +183,7 @@ namespace Checkers.Logic
             if (origin == destination)
             { throw new Exception("Origin and destination is the same field!"); }
 
-            var work_board = Get_board(Check_active_player());
+            var work_board = Get_copy_of_board(Check_active_player());
             var current_piece = work_board[origin.Y, origin.X];
             if (current_piece == null)
             { throw new Exception("Origin field is empty!"); }
@@ -263,7 +270,7 @@ namespace Checkers.Logic
                     }
                     else//wlasciwe bicie
                     {
-                        Single_capturing_by_piece(ref work_board, origin, destination);
+                        Single_capturing_by_piece(work_board, origin, destination);
                         Set_board(Check_active_player(), work_board);
 
                         if (length_of_capturing > 1)
@@ -310,7 +317,7 @@ namespace Checkers.Logic
                 {
                     var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                     copy_of_board = work_board.Clone() as Checkers_piece[,];
-                    Single_capturing_by_piece(ref copy_of_board, origin, dest);//trzeba wykonac to bicie na kopii planszy
+                    Single_capturing_by_piece(copy_of_board, origin, dest);//trzeba wykonac to bicie na kopii planszy
                     //Console.WriteLine("Zaczynam szukac kolejnych bic po zbiciu przeciwnika " + oponent.ToString() + " i destination " + dest.ToString());
                     //Console.WriteLine("Teraz plansza wygląda tak");
                     //Display_board_helper(copy_of_board, Color.White);
@@ -562,41 +569,41 @@ namespace Checkers.Logic
             return new List<List<Coordinates>>();
         }
 
-        private void Single_capturing_by_piece(ref Checkers_piece[,] work_board, Coordinates origin, Coordinates destination)//changes a work_board!
+        private void Single_capturing_by_piece(Checkers_piece[,] board, Coordinates origin, Coordinates destination)//changes a board!
         {
             string name_of_function = "Single_capturing_by_piece";
-            if (work_board[origin.Y, origin.X].Type == Type.Man)
+            if (board[origin.Y, origin.X].Type == Type.Man)
             {
-                var current_piece = work_board[origin.Y, origin.X];
+                var current_piece = board[origin.Y, origin.X];
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;
                 var y_distance = destination.Y - origin.Y;
 
                 if ((x_distance == 2 || x_distance == -2) && (y_distance == 2 || y_distance == -2))//bicie pionkiem w dowolnym kierunku
                 {
-                    work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
-                    work_board[origin.Y, origin.X] = null;
+                    board[destination.Y, destination.X] = board[origin.Y, origin.X];
+                    board[origin.Y, origin.X] = null;
                     var oponent_piece_coords = new Coordinates((destination.X - x_distance / 2), (destination.Y - y_distance / 2));
-                    var oponent_piece = work_board[oponent_piece_coords.Y, oponent_piece_coords.X];
+                    var oponent_piece = board[oponent_piece_coords.Y, oponent_piece_coords.X];
                     if (Check_oponent_player() != oponent_piece.Color)
                     { throw new Exception("Your are trying to jump over your own piece!"); }
 
-                    work_board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
+                    board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
 
-                    var possible_ways = Get_the_longest_capturings_for_this_piece(work_board, destination);
+                    var possible_ways = Get_the_longest_capturings_for_this_piece(board, destination);
 
                     if (current_piece.Type == Type.Man && destination.Y == 0 && (possible_ways.Count() == 0))//jesli nie ma dalszego bicia to pionek sie zmienia na dame
-                    { work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }
+                    { board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }
                 }
                 else
                 { throw new Exception("Capturing is not allowed right now!"); }
             }
-            else if (work_board[origin.Y, origin.X].Type == Type.King)
+            else if (board[origin.Y, origin.X].Type == Type.King)
             {
                 //Console.WriteLine("Przed zbiciem");
                 //Display_board_helper(work_board, Color.White);
-                work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
-                work_board[origin.Y, origin.X] = null;
+                board[destination.Y, destination.X] = board[origin.Y, origin.X];
+                board[origin.Y, origin.X] = null;
 
                 var x_distance = destination.X - origin.X;
                 if (x_distance < 0)
@@ -610,22 +617,22 @@ namespace Checkers.Logic
                 {
                     if (destination.X > origin.X && destination.Y > origin.Y)
                     {
-                        work_board[origin.Y + i, origin.X + i] = null;
+                        board[origin.Y + i, origin.X + i] = null;
                         //Console.WriteLine("Null na " + (origin.X + i) + "," + (origin.Y + i));
                     }
                     else if (destination.X < origin.X && destination.Y > origin.Y)
                     {
-                        work_board[origin.Y + i, origin.X - i] = null;
+                        board[origin.Y + i, origin.X - i] = null;
                         //Console.WriteLine("Null na " + (origin.X - i) + "," + (origin.Y + i));
                     }
                     else if (destination.X > origin.X && destination.Y < origin.Y)
                     {
-                        work_board[origin.Y - i, origin.X + i] = null;
+                        board[origin.Y - i, origin.X + i] = null;
                         //Console.WriteLine("Null na " + (origin.X + i) + "," + (origin.Y - i));
                     }
                     else if (destination.X < origin.X && destination.Y < origin.Y)
                     {
-                        work_board[origin.Y - i, origin.X - i] = null;
+                        board[origin.Y - i, origin.X - i] = null;
                         //Console.WriteLine("Null na " + (origin.X - i) + "," + (origin.Y - i));
                     }
                 }
