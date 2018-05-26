@@ -231,16 +231,16 @@ namespace Checkers.Logic
                         }
                     }
                 }
-                Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
-                Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
-                foreach (var way in all_the_longest_possible_ways)
-                {
-                    foreach (var step in way)
-                    {
-                        Console.Write(" -> " + step.ToString());
-                    }
-                    Console.Write("\n");
-                }
+                //Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
+                //Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
+                //foreach (var way in all_the_longest_possible_ways)
+                //{
+                //    foreach (var step in way)
+                //    {
+                //        Console.Write(" -> " + step.ToString());
+                //    }
+                //    Console.Write("\n");
+                //}
 
                 //odleglosc wraz ze znakiem zwrotu/kierunku
                 var x_distance = destination.X - origin.X;

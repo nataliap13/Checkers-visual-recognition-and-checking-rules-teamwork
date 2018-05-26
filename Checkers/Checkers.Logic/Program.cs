@@ -14,29 +14,33 @@ namespace Checkers.Logic
             try
             {
                 //test_change_man_to_king();
-                test_capturing_oponents_piece();
+                //test_capturing_oponents_piece();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
                 //test_capturing_oponent_piece_by_multiple_pieces();
-                //test_NOT_change_man_to_king_and_capturings();
+                test_NOT_change_man_to_king_and_capturings();
                 //test_capturing_multiple_oponents_pieces_by_one_king();
+                //test_of_reference_in_functions();
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
         }
         private static void Display_board_helper(Draughts_checkers game, Color color)
         {
-            Checkers_piece[,] board = game.Get_board(color);
+            Checkers_piece[,] board = game.Get_copy_of_board(color);
             int number_of_fields_in_row = game.Number_of_fields_in_row;
-            //Console.Write("\n");
+            Display_board_helper(board, number_of_fields_in_row, color);
+        }
 
+        private static void Display_board_helper(Checkers_piece[,] board, int _number_of_fields_in_row, Color color)
+        {
             Console.Write("\n---");
-            for (int i = 0; i < number_of_fields_in_row; i++)
+            for (int i = 0; i < _number_of_fields_in_row; i++)
             { Console.Write(i + " "); }
 
-            for (int i = 0; i < number_of_fields_in_row; i++)//i is row
+            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
             {
                 Console.Write("\n" + i + ". ");
-                for (int j = 0; j < number_of_fields_in_row; j++)//j is column
+                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
                 {
                     if (board[i, j] == null)
                     { Console.Write("= "); }
@@ -46,7 +50,7 @@ namespace Checkers.Logic
                 }
             }
             Console.Write("\n---");
-            for (int i = 0; i < number_of_fields_in_row; i++)
+            for (int i = 0; i < _number_of_fields_in_row; i++)
             { Console.Write(i + " "); }
             Console.Write(color + "\n");
         }
@@ -67,14 +71,14 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
             board[1, 6] = new Checkers_piece(Color.White, Type.Man);
-            game.Load_board(board, Color.White);
+            game.Set_board(Color.White, board);
 
             Display_board(game);
             Make_move_and_display_boards(ref game, white_key, new Coordinates(6, 1), new Coordinates(5, 0));
@@ -84,10 +88,10 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             Display_board(game, Color.White);
             //Display_board(game, Color.Black);
@@ -103,10 +107,10 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             Display_board(game, Color.White);
             //Display_board(game, Color.Black);
@@ -123,10 +127,10 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             //Display_board(game, Color.White);
             //Display_board(game, Color.Black);
@@ -143,17 +147,17 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
 
             Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
             board[2, 7] = new Checkers_piece(Color.White, Type.Man);
             board[1, 6] = new Checkers_piece(Color.Black, Type.Man);
             board[1, 4] = new Checkers_piece(Color.Black, Type.Man);
-            game.Load_board(board, Color.White);
+            game.Set_board(Color.White, board);
 
             Display_board(game);
             Make_move_and_display_boards(ref game, white_key, new Coordinates(7, 2), new Coordinates(5, 0));
@@ -164,20 +168,40 @@ namespace Checkers.Logic
             const int r = 8;// number_of_fields_in_row = 8;
             const int pcs = 12;// number_of_pieces_per_player = 12;
             Draughts_checkers game = new Draughts_checkers(r, pcs);
-            var white_key = game.Generate_player_key(true);
+            var white_key = game.Generate_player_key(Color.White);
             Console.WriteLine("White key: " + white_key);
 
-            var black_key = game.Generate_player_key(false);
+            var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
             board[4, 3] = new Checkers_piece(Color.White, Type.King);
             board[3, 2] = new Checkers_piece(Color.Black, Type.Man);
             board[6, 5] = new Checkers_piece(Color.Black, Type.Man);
-            game.Load_board(board, Color.White);
+            game.Set_board(Color.White, board);
 
             Display_board(game);
             Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(2, 5));//runs exception
         }
-        //sprawdzic czy jesli pionek ma wiele bic i odbija sie od bandy to czy nie zostanie zamieniony na dame
+        private static void test_of_reference_in_functions()//now result is no//bcoz function set_board has been changed to load a copy, not a reference
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(Color.White);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(Color.Black);
+            Console.WriteLine("Black key: " + black_key);
+            Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            board[4, 3] = new Checkers_piece(Color.White, Type.King);
+            board[3, 2] = new Checkers_piece(Color.Black, Type.Man);
+            board[6, 5] = new Checkers_piece(Color.Black, Type.Man);
+            game.Set_board(Color.Black, board);
+            Display_board(game);
+
+            board[1, 0] = new Checkers_piece(Color.Black, Type.King);
+            Display_board(game);
+        }
+
     }
 }
