@@ -59,20 +59,6 @@ namespace Checkers.Logic
         public int Number_of_fields_in_row { get => _number_of_fields_in_row; }
         public int Number_of_pieces_per_player { get => _number_of_pieces_per_player; }
 
-        public int Number_of_pieces(Color color, Type type)
-        {
-            int number_of_pieces = 0;
-            for (int i = 0; i < Number_of_fields_in_row; i++)
-            {
-                for (int j = 0; j < Number_of_fields_in_row; j++)
-                {
-                    if (board_black[i, j].Color == color && board_black[i, j].Type == type)
-                    { number_of_pieces++; }
-                }
-            }
-            return number_of_pieces;
-        }
-
         public Checkers_piece[,] Get_copy_of_board(Color color)
         {
             if (color == Color.Black)
@@ -366,25 +352,17 @@ namespace Checkers.Logic
 
                     if (work_board[origin.Y, origin.X].Type == Type.Man)
                     {
-                        Coordinates oponent1 = new Coordinates(origin.X - 1, origin.Y - 1);
-                        Coordinates oponent2 = new Coordinates(origin.X + 1, origin.Y - 1);
-                        Coordinates oponent3 = new Coordinates(origin.X + 1, origin.Y + 1);
-                        Coordinates oponent4 = new Coordinates(origin.X - 1, origin.Y + 1);
                         List<Coordinates> oponents = new List<Coordinates>();
-                        oponents.Add(oponent1);
-                        oponents.Add(oponent2);
-                        oponents.Add(oponent3);
-                        oponents.Add(oponent4);
+                        oponents.Add(new Coordinates(origin.X - 1, origin.Y - 1));
+                        oponents.Add(new Coordinates(origin.X + 1, origin.Y - 1));
+                        oponents.Add(new Coordinates(origin.X + 1, origin.Y + 1));
+                        oponents.Add(new Coordinates(origin.X - 1, origin.Y + 1));
 
-                        Coordinates dest1 = new Coordinates(origin.X - 2, origin.Y - 2);
-                        Coordinates dest2 = new Coordinates(origin.X + 2, origin.Y - 2);
-                        Coordinates dest3 = new Coordinates(origin.X + 2, origin.Y + 2);
-                        Coordinates dest4 = new Coordinates(origin.X - 2, origin.Y + 2);
                         List<Coordinates> dests = new List<Coordinates>();
-                        dests.Add(dest1);
-                        dests.Add(dest2);
-                        dests.Add(dest3);
-                        dests.Add(dest4);
+                        dests.Add(new Coordinates(origin.X - 2, origin.Y - 2));
+                        dests.Add(new Coordinates(origin.X + 2, origin.Y - 2));
+                        dests.Add(new Coordinates(origin.X + 2, origin.Y + 2));
+                        dests.Add(new Coordinates(origin.X - 2, origin.Y + 2));
 
                         for (int i = 0; i < dests.Count(); i++)
                         {
@@ -519,11 +497,11 @@ namespace Checkers.Logic
                                     { empty_fields_to_oponent4 = false; }
                                 }
 
-                                for (int k = 0; k < dests.Count(); k++)
+                                for (int dest_ID = 0; dest_ID < dests.Count(); dest_ID++)
                                 {
-                                    if (empty_fields_to_oponents[k] == true)
+                                    if (empty_fields_to_oponents[dest_ID] == true)
                                     {
-                                        var single_iteration_possible_ways = Find_the_longest_capturings_for_this_piece_and_oponent_and_destination(work_board, origin, oponents[k], dests[k]);
+                                        var single_iteration_possible_ways = Find_the_longest_capturings_for_this_piece_and_oponent_and_destination(work_board, origin, oponents[dest_ID], dests[dest_ID]);
                                         possible_ways = possible_ways.Concat(single_iteration_possible_ways).ToList();
                                     }
                                 }
