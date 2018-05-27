@@ -377,29 +377,17 @@ namespace Checkers.Logic
                             //Console.WriteLine("i = " + i);
                             for (int j = i + 1; j < Number_of_fields_in_row; j++)//j to odleglosc pomiedzy polem naszej damy, a wolnym polem za zbijanym pionkiem/dama
                             {
-                                //Console.WriteLine("j = " + j);
-                                Coordinates oponent1 = new Coordinates(origin.X - i, origin.Y - i);
-                                Coordinates oponent2 = new Coordinates(origin.X + i, origin.Y - i);
-                                Coordinates oponent3 = new Coordinates(origin.X + i, origin.Y + i);
-                                Coordinates oponent4 = new Coordinates(origin.X - i, origin.Y + i);
                                 List<Coordinates> oponents = new List<Coordinates>();
-                                oponents.Add(oponent1);
-                                oponents.Add(oponent2);
-                                oponents.Add(oponent3);
-                                oponents.Add(oponent4);
-                                //foreach (var x in oponents)
-                                //{ Console.WriteLine("Czy jest przeciwnik na " + x); }
+                                oponents.Add(new Coordinates(origin.X - i, origin.Y - i));
+                                oponents.Add(new Coordinates(origin.X + i, origin.Y - i));
+                                oponents.Add(new Coordinates(origin.X + i, origin.Y + i));
+                                oponents.Add(new Coordinates(origin.X - i, origin.Y + i));
 
-
-                                Coordinates dest1 = new Coordinates(origin.X - j, origin.Y - j);
-                                Coordinates dest2 = new Coordinates(origin.X + j, origin.Y - j);
-                                Coordinates dest3 = new Coordinates(origin.X + j, origin.Y + j);
-                                Coordinates dest4 = new Coordinates(origin.X - j, origin.Y + j);
                                 List<Coordinates> dests = new List<Coordinates>();
-                                dests.Add(dest1);
-                                dests.Add(dest2);
-                                dests.Add(dest3);
-                                dests.Add(dest4);
+                                dests.Add(new Coordinates(origin.X - j, origin.Y - j));
+                                dests.Add(new Coordinates(origin.X + j, origin.Y - j));
+                                dests.Add(new Coordinates(origin.X + j, origin.Y + j));
+                                dests.Add(new Coordinates(origin.X - j, origin.Y + j));
 
                                 //trzeba sprawdzic czy pomiedzy dama a pionkiem przeciwnika wszystkie pola sa wolne
                                 //trzeba sprawdzic czy pomiedzy pionkiem przeciwnika a miejscem odlozenia damy tez wszystkie pola sa wolne
@@ -420,10 +408,7 @@ namespace Checkers.Logic
                                     try
                                     {
                                         if (work_board[origin.Y - d, origin.X - d] != null)
-                                        {
-                                            empty_fields_to_oponent1 = false;
-                                            //Console.WriteLine("11 Pole " + (origin.X - d) + "," + (origin.Y - d) + " nie jest puste dla przeciwnika na " + oponent1.ToString());
-                                        }
+                                        { empty_fields_to_oponent1 = false; }
                                     }
                                     catch (Exception)
                                     { empty_fields_to_oponent1 = false; }
@@ -439,10 +424,7 @@ namespace Checkers.Logic
                                     try
                                     {
                                         if (work_board[origin.Y + d, origin.X + d] != null)
-                                        {
-                                            empty_fields_to_oponent3 = false;
-                                            //Console.WriteLine("13 Pole " + (origin.X + d) + "," + (origin.Y + d) + " nie jest puste dla przeciwnika na " + oponent3.ToString());
-                                        }
+                                        { empty_fields_to_oponent3 = false; }
                                     }
                                     catch (Exception)
                                     { empty_fields_to_oponent3 = false; }
@@ -460,10 +442,7 @@ namespace Checkers.Logic
                                     try
                                     {
                                         if (work_board[origin.Y - d, origin.X - d] != null)
-                                        {
-                                            empty_fields_to_oponent1 = false;
-                                            //Console.WriteLine("21 Pole " + (origin.X - d) + "," + (origin.Y - d) + " nie jest puste dla przeciwnika na " + oponent1.ToString());
-                                        }
+                                        { empty_fields_to_oponent1 = false; }
                                     }
                                     catch (Exception)
                                     { empty_fields_to_oponent1 = false; }
@@ -479,10 +458,7 @@ namespace Checkers.Logic
                                     try
                                     {
                                         if (work_board[origin.Y + d, origin.X + d] != null)
-                                        {
-                                            empty_fields_to_oponent3 = false;
-                                            //Console.WriteLine("23 Pole " + (origin.X + d) + "," + (origin.Y + d) + " nie jest puste dla przeciwnika na " + oponent3.ToString());
-                                        }
+                                        { empty_fields_to_oponent3 = false; }
                                     }
                                     catch (Exception)
                                     { empty_fields_to_oponent3 = false; }
@@ -505,24 +481,13 @@ namespace Checkers.Logic
                                         possible_ways = possible_ways.Concat(single_iteration_possible_ways).ToList();
                                     }
                                 }
-                                //Console.WriteLine("END j = " + j);
                             }
-                            //Console.WriteLine("END i = " + i);
-                            //Console.WriteLine("END Number_of_fields_in_row = " + Number_of_fields_in_row);
                         }
                     }
                     else
                     { throw new Exception("Something went wrong with piece type in " + name_of_function + "!"); }
                     var final_possible_ways = new List<List<Coordinates>>();
                     int final_length = 0;
-                    //Console.WriteLine("Possible ways wygląda tak: ");
-
-                    //foreach (var way in possible_ways)
-                    //{
-                    //    foreach (var step in way)
-                    //    { Console.Write(" -> " + step.ToString()); }
-                    //    Console.WriteLine("");
-                    //}
 
                     foreach (var way in possible_ways)
                     {
@@ -542,7 +507,7 @@ namespace Checkers.Logic
                 else
                 { throw new Exception("Something went wrong in " + name_of_function + "!"); }
             }
-            catch (Exception e)
+            catch (Exception)
             { }
             return new List<List<Coordinates>>();
         }

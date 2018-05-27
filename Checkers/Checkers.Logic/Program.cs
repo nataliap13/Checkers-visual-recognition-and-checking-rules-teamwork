@@ -17,8 +17,8 @@ namespace Checkers.Logic
                 //test_capturing_oponents_piece();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
                 //test_capturing_oponent_piece_by_multiple_pieces();
-                test_NOT_change_man_to_king_and_capturings();
-                //test_capturing_multiple_oponents_pieces_by_one_king();
+                //test_NOT_change_man_to_king_and_capturings();
+                test_capturing_multiple_oponents_pieces_by_one_king();
                 //test_of_reference_in_functions();
             }
             catch (Exception e)
