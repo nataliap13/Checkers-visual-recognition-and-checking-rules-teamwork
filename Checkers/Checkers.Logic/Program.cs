@@ -180,7 +180,8 @@ namespace Checkers.Logic
             game.Set_board(Color.White, board);
 
             Display_board(game);
-            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(2, 5));//runs exception
+            //Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(2, 5));//runs exception
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(0, 1));//not run exception
         }
         private static void test_of_reference_in_functions()//now result is no//bcoz function set_board has been changed to load a copy, not a reference
         {

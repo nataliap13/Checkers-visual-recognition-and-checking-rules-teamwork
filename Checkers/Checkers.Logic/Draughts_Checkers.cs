@@ -186,37 +186,9 @@ namespace Checkers.Logic
             //wlasciwa rozgrywka
             {
                 //szukanie najdluzszych bic dla pionkow ktore to bicie oferuja
-                List<List<Coordinates>> all_the_longest_possible_ways = new List<List<Coordinates>>();
                 int length_of_capturing = 0;
-                for (int i = 0; i < _number_of_fields_in_row; i++)//row
-                {
-                    for (int j = 0; j < _number_of_fields_in_row; j++)//column
-                    {
-                        var possible_ways_for_this_piece = Get_the_longest_capturings_for_this_piece(work_board, new Coordinates(j, i));
-                        if (possible_ways_for_this_piece.Count() > 0)
-                        {
-                            foreach (var way in possible_ways_for_this_piece)
-                            {//dlugosc bicia jest o 1 krotsza od dlugosci sciezki, dlatego najpierw sprawdzamy a potem dodajemy poczatkowe wspolrzedne
-                                if (length_of_capturing > 0 && way.Count == length_of_capturing)
-                                {
-                                    way.Reverse();
-                                    way.Add(new Coordinates(j, i));
-                                    way.Reverse();
-                                    all_the_longest_possible_ways.Add(way);
-                                }
-                                else if (way.Count() > length_of_capturing)
-                                {
-                                    length_of_capturing = way.Count();
-                                    all_the_longest_possible_ways = new List<List<Coordinates>>();
-                                    way.Reverse();
-                                    way.Add(new Coordinates(j, i));
-                                    way.Reverse();
-                                    all_the_longest_possible_ways.Add(way);
-                                }
-                            }
-                        }
-                    }
-                }
+                var all_the_longest_possible_ways = Get_the_longest_capturings(work_board, ref length_of_capturing);
+
                 //Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
                 //Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
                 //foreach (var way in all_the_longest_possible_ways)
@@ -304,11 +276,7 @@ namespace Checkers.Logic
                     var copy_of_board = new Checkers_piece[_number_of_fields_in_row, _number_of_fields_in_row];
                     copy_of_board = work_board.Clone() as Checkers_piece[,];
                     Single_capturing_by_piece(copy_of_board, origin, dest);//trzeba wykonac to bicie na kopii planszy
-                    //Console.WriteLine("Zaczynam szukac kolejnych bic po zbiciu przeciwnika " + oponent.ToString() + " i destination " + dest.ToString());
-                    //Console.WriteLine("Teraz plansza wygląda tak");
-                    //Display_board_helper(copy_of_board, Color.White);
-                    var local_possible_ways = Get_the_longest_capturings_for_this_piece(copy_of_board, dest);
-                    //Console.WriteLine("local_possible_ways.Count() = " + local_possible_ways.Count());
+                    var local_possible_ways = Find_the_longest_capturings_for_this_piece(copy_of_board, dest);
                     if (local_possible_ways.Count() == 0)
                     {
                         var new_list = new List<Coordinates>();
@@ -324,15 +292,6 @@ namespace Checkers.Logic
                             way.Reverse();
                         }
                     }
-                    //Console.WriteLine("Znaleziono takie drogi");
-                    //foreach (var way in local_possible_ways)
-                    //{
-                    //    foreach (var step in way)
-                    //    {
-                    //        Console.Write(" -> " + step.ToString());
-                    //    }
-                    //}
-                    //Console.WriteLine("");
                     possible_ways = possible_ways.Concat(local_possible_ways).ToList();
                 }
             }
@@ -341,7 +300,7 @@ namespace Checkers.Logic
             return possible_ways;
         }
 
-        private List<List<Coordinates>> Get_the_longest_capturings_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)
+        private List<List<Coordinates>> Find_the_longest_capturings_for_this_piece(Checkers_piece[,] work_board, Coordinates origin)
         {
             string name_of_function = "Get_the_longest_capturings_for_this_piece";
             try
@@ -511,6 +470,41 @@ namespace Checkers.Logic
             { }
             return new List<List<Coordinates>>();
         }
+        private List<List<Coordinates>> Get_the_longest_capturings(Checkers_piece[,] work_board, ref int length_of_capturing)
+        {
+            List<List<Coordinates>> all_the_longest_possible_ways = new List<List<Coordinates>>();
+            length_of_capturing = 0;
+            for (int i = 0; i < _number_of_fields_in_row; i++)//row
+            {
+                for (int j = 0; j < _number_of_fields_in_row; j++)//column
+                {
+                    var possible_ways_for_this_piece = Find_the_longest_capturings_for_this_piece(work_board, new Coordinates(j, i));
+                    if (possible_ways_for_this_piece.Count() > 0)
+                    {
+                        foreach (var way in possible_ways_for_this_piece)
+                        {//dlugosc bicia jest o 1 krotsza od dlugosci sciezki, dlatego najpierw sprawdzamy a potem dodajemy poczatkowe wspolrzedne
+                            if (length_of_capturing > 0 && way.Count == length_of_capturing)
+                            {
+                                way.Reverse();
+                                way.Add(new Coordinates(j, i));
+                                way.Reverse();
+                                all_the_longest_possible_ways.Add(way);
+                            }
+                            else if (way.Count() > length_of_capturing)
+                            {
+                                length_of_capturing = way.Count();
+                                all_the_longest_possible_ways = new List<List<Coordinates>>();
+                                way.Reverse();
+                                way.Add(new Coordinates(j, i));
+                                way.Reverse();
+                                all_the_longest_possible_ways.Add(way);
+                            }
+                        }
+                    }
+                }
+            }
+            return all_the_longest_possible_ways;
+        }
 
         private void Single_capturing_by_piece(Checkers_piece[,] board, Coordinates origin, Coordinates destination)//changes a board!
         {
@@ -533,7 +527,7 @@ namespace Checkers.Logic
 
                     board[oponent_piece_coords.Y, oponent_piece_coords.X] = null;
 
-                    var possible_ways = Get_the_longest_capturings_for_this_piece(board, destination);
+                    var possible_ways = Find_the_longest_capturings_for_this_piece(board, destination);
 
                     if (current_piece.Type == Type.Man && destination.Y == 0 && (possible_ways.Count() == 0))//jesli nie ma dalszego bicia to pionek sie zmienia na dame
                     { board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King); }
