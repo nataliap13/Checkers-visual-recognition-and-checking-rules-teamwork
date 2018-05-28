@@ -174,14 +174,21 @@ namespace Checkers.Logic
             var black_key = game.Generate_player_key(Color.Black);
             Console.WriteLine("Black key: " + black_key);
             Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
-            board[4, 3] = new Checkers_piece(Color.White, Type.King);
-            board[3, 2] = new Checkers_piece(Color.Black, Type.Man);
+            board[4, 1] = new Checkers_piece(Color.White, Type.Man);
+            board[5, 2] = new Checkers_piece(Color.White, Type.King);
+            board[2, 1] = new Checkers_piece(Color.Black, Type.Man);
             board[6, 5] = new Checkers_piece(Color.Black, Type.Man);
+            board[1, 4] = new Checkers_piece(Color.Black, Type.Man);
             game.Set_board(Color.White, board);
 
             Display_board(game);
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(2, 5), new Coordinates(3, 4));
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(6, 5), new Coordinates(5, 4));
             //Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(2, 5));//runs exception
-            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(0, 1));//not run exception
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(3, 4), new Coordinates(6, 7));//not run exception
+
+            //Make_move_and_display_boards(ref game, white_key, new Coordinates(0, 1), new Coordinates(6, 7));//not run exception
+            Make_move_and_display_boards(ref game, white_key, new Coordinates(1, 4), new Coordinates(3, 2));// runs exception
         }
         private static void test_of_reference_in_functions()//now result is no//bcoz function set_board has been changed to load a copy, not a reference
         {

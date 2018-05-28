@@ -14,10 +14,14 @@ namespace Checkers.Logic
         private int _player_white_secret_key = 0;
         private int _player_turn_key;
         private int _number_of_pieces_per_player;
+        private Coordinates _last_moved_piece_coords;//potrzebny do pilnowania kontynuacji bicia tym samym pionkiem
+        private Color _last_moved_piece_coords_color;//potrzebny do pilnowania kontynuacji bicia tym samym pionkiem
         private Random _rand = new Random();
 
         public Draughts_checkers(int number_of_fields_in_row_, int number_of_pieces_per_player)
         {
+            //_last_moved_piece_coords = new Coordinates(0, 0);
+            //_last_moved_piece_coords_color = Color.Black;
             _number_of_pieces_per_player = number_of_pieces_per_player;
             if (number_of_pieces_per_player >= (number_of_fields_in_row_ * number_of_fields_in_row_ / 4))
             {
@@ -71,7 +75,7 @@ namespace Checkers.Logic
         }
         public void Set_board(Color active_player_color, Checkers_piece[,] board)
         {
-            if(Check_active_player() != active_player_color)
+            if (Check_active_player() != active_player_color)
             { Switch_player_turn(); }
 
             if (active_player_color == Color.Black)
@@ -80,7 +84,9 @@ namespace Checkers.Logic
                 board_black = copy_of_board_black;
             }
             else
-            { board_black = Rotate_board(board); }
+            {
+                board_black = Rotate_board(board);
+            }
         }
         private Checkers_piece[,] Rotate_board(Checkers_piece[,] board_to_rotate)
         {
@@ -153,14 +159,28 @@ namespace Checkers.Logic
         private void Switch_player_turn()
         {
             if (_player_turn_key == _player_black_secret_key)
-            { _player_turn_key = _player_white_secret_key; }
+            {
+                _player_turn_key = _player_white_secret_key;
+            }
 
             else if (_player_turn_key == _player_white_secret_key)
             { _player_turn_key = _player_black_secret_key; }
             else
             { throw new Exception("Unexpected Switch_player_turn_key exception!"); };
         }
+        // Explicit predicate delegate.
+        private bool Find_last_moved_piece_in_way(List<Coordinates> way)
+        {
+            if (way[0] == _last_moved_piece_coords)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
+        }
         public void Make_move(int player_secret_key, Coordinates origin, Coordinates destination)//int is error code, to be implemented
         {
             if (Check_active_player(player_secret_key) == false)
@@ -187,7 +207,37 @@ namespace Checkers.Logic
             {
                 //szukanie najdluzszych bic dla pionkow ktore to bicie oferuja
                 int length_of_capturing = 0;
-                var all_the_longest_possible_ways = Get_the_longest_capturings(work_board, ref length_of_capturing);
+                List<List<Coordinates>> all_the_longest_possible_ways = new List<List<Coordinates>>();
+                if (_last_moved_piece_coords_color == Check_active_player())
+                {
+                    var possible_ways_for_this_piece = Find_the_longest_capturings_for_this_piece(work_board, _last_moved_piece_coords);
+                    if (possible_ways_for_this_piece.Count() > 0)
+                    {
+                        foreach (var way in possible_ways_for_this_piece)
+                        {
+                            if (length_of_capturing > 0 && way.Count == length_of_capturing)
+                            {
+                                way.Reverse();
+                                way.Add(_last_moved_piece_coords);
+                                way.Reverse();
+                                all_the_longest_possible_ways.Add(way);
+                            }
+                            else if (way.Count() > length_of_capturing)
+                            {
+                                length_of_capturing = way.Count();
+                                all_the_longest_possible_ways = new List<List<Coordinates>>();
+                                way.Reverse();
+                                way.Add(_last_moved_piece_coords);
+                                way.Reverse();
+                                all_the_longest_possible_ways.Add(way);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    all_the_longest_possible_ways = Get_the_longest_capturings(work_board, ref length_of_capturing);
+                }
 
                 //Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
                 //Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
@@ -205,6 +255,7 @@ namespace Checkers.Logic
                 var y_distance = destination.Y - origin.Y;
                 if (length_of_capturing > 0)//bicie jest obowiazkowe
                 {
+
                     List<Coordinates> chosen_way = new List<Coordinates>();//szukanie sciezki wybranej przez gracza
                     foreach (var way in all_the_longest_possible_ways)
                     {
@@ -230,6 +281,8 @@ namespace Checkers.Logic
                     {
                         Single_capturing_by_piece(work_board, origin, destination);
                         Set_board(Check_active_player(), work_board);
+                        _last_moved_piece_coords = destination;
+                        _last_moved_piece_coords_color = work_board[_last_moved_piece_coords.Y, _last_moved_piece_coords.X].Color;
 
                         if (length_of_capturing > 1)
                         {
@@ -248,6 +301,8 @@ namespace Checkers.Logic
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
                     Set_board(Check_active_player(), work_board);
+                    _last_moved_piece_coords = destination;
+                    _last_moved_piece_coords_color = work_board[_last_moved_piece_coords.Y, _last_moved_piece_coords.X].Color;
                     if (current_piece.Type == Type.Man && destination.Y == 0)//jesli ruszymy pionek o 1 i dociera on do bandy to na pewno zostanie zamieniony na dame
                     {
                         work_board[destination.Y, destination.X] = new Checkers_piece(Check_active_player(), Type.King);
@@ -259,6 +314,8 @@ namespace Checkers.Logic
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
                     Set_board(Check_active_player(), work_board);
+                    _last_moved_piece_coords = destination;
+                    _last_moved_piece_coords_color = work_board[_last_moved_piece_coords.Y, _last_moved_piece_coords.X].Color;
                 }
                 else
                 { throw new Exception("Move " + origin.ToString() + "->" + destination.ToString() + " not allowed!"); }
