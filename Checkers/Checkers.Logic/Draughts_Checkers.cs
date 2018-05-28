@@ -227,6 +227,7 @@ namespace Checkers.Logic
                 int length_of_capturing = 0;
                 List<List<Coordinates>> all_the_longest_possible_ways = Get_the_longest_capturings(work_board, ref length_of_capturing);
 
+                //Console.WriteLine("Teraz jest tura " + Check_active_player());
                 //Console.WriteLine("\nZnaleziono " + length_of_capturing + " bic z rzedu.");
                 //Console.WriteLine("Najdluzsze bicia mozna wykonac sciezkami: ");
                 //foreach (var way in all_the_longest_possible_ways)
@@ -536,7 +537,7 @@ namespace Checkers.Logic
             }
             return all_the_longest_possible_ways;
         }
-        private List<List<Coordinates>> Get_the_longest_capturings(Checkers_piece[,] work_board, ref int length_of_capturing)
+        public List<List<Coordinates>> Get_the_longest_capturings(Checkers_piece[,] work_board, ref int length_of_capturing)
         {
             List<List<Coordinates>> all_the_longest_possible_ways = new List<List<Coordinates>>();
             //length_of_capturing = 0;
@@ -544,7 +545,7 @@ namespace Checkers.Logic
             if (_last_moved_piece_coords_color == Check_active_player())
             {
                 var possible_ways_for_this_piece = Find_the_longest_capturings_for_this_piece(work_board, _last_moved_piece_coords);
-                all_the_longest_possible_ways = possible_ways_for_this_piece;
+                all_the_longest_possible_ways = Select_all_the_longest_possible_ways(possible_ways_for_this_piece, ref length_of_capturing);
                 foreach (var way in all_the_longest_possible_ways)
                 {
                     way.Reverse();
@@ -571,6 +572,8 @@ namespace Checkers.Logic
                 }
             }
             all_the_longest_possible_ways = Select_all_the_longest_possible_ways(all_the_longest_possible_ways, ref length_of_capturing);
+            if (length_of_capturing > 0)
+            { length_of_capturing--; }
             return all_the_longest_possible_ways;
         }
 
