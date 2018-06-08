@@ -13,12 +13,13 @@ namespace Checkers.Logic
         {
             try
             {
+                test_Piotrka();
                 //test_change_man_to_king();
                 //test_capturing_oponents_piece();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
                 //test_capturing_oponent_piece_by_multiple_pieces();
                 //test_NOT_change_man_to_king_and_capturings();
-                test_capturing_multiple_oponents_pieces_by_one_king();
+                //test_capturing_multiple_oponents_pieces_by_one_king();
                 //test_of_reference_in_functions();
             }
             catch (Exception e)
@@ -66,6 +67,34 @@ namespace Checkers.Logic
             Display_board(game, game.Check_active_player());
         }
 
+        private static void test_Piotrka()
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(Color.White);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(Color.Black);
+            Console.WriteLine("Black key: " + black_key);
+            Checkers_piece[,] board = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            board[0, 1] = new Checkers_piece(Color.White, Type.Man);
+            board[0, 3] = new Checkers_piece(Color.White, Type.Man);
+            board[0, 5] = new Checkers_piece(Color.Black, Type.King);
+            board[0, 7] = new Checkers_piece(Color.White, Type.Man);
+            board[1, 0] = new Checkers_piece(Color.Black, Type.Man);
+            board[0, 3] = new Checkers_piece(Color.Black, Type.Man);
+            board[4, 7] = new Checkers_piece(Color.White, Type.Man);
+            board[6, 1] = new Checkers_piece(Color.Black, Type.Man);
+            board[6, 3] = new Checkers_piece(Color.Black, Type.Man);
+            board[6, 7] = new Checkers_piece(Color.Black, Type.Man);
+            board[7, 0] = new Checkers_piece(Color.Black, Type.Man);
+            board[7, 2] = new Checkers_piece(Color.Black, Type.Man);
+            game.Set_board(Color.Black, board);
+
+            Display_board(game);
+            Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 0), new Coordinates(0, 5));
+        }
         private static void test_change_man_to_king()
         {
             const int r = 8;// number_of_fields_in_row = 8;

@@ -298,7 +298,7 @@ namespace Checkers.Logic
                         Set_board(Check_active_player(), work_board);
                     }
                 }
-                else if ((x_distance == y_distance) && current_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
+                else if (((x_distance == y_distance) || (x_distance == -y_distance)) && current_piece.Type == Type.King)//przesuniecie damy w dowolnym kierunku ukosnym
                 {
                     work_board[destination.Y, destination.X] = work_board[origin.Y, origin.X];
                     work_board[origin.Y, origin.X] = null;
