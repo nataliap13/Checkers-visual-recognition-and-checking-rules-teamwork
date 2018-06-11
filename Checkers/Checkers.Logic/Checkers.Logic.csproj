@@ -45,6 +45,7 @@
     <Compile Include="Checkers_piece.cs" />
     <Compile Include="Coordinates.cs" />
     <Compile Include="Draughts_Checkers.cs" />
+    <Compile Include="Move_Detector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

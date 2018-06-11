@@ -16,6 +16,8 @@ namespace Checkers.Logic
         private int _number_of_pieces_per_player;
         private Coordinates _last_moved_piece_coords;//potrzebny do pilnowania kontynuacji bicia tym samym pionkiem
         private Color _last_moved_piece_coords_color;//potrzebny do pilnowania kontynuacji bicia tym samym pionkiem
+        public Coordinates Last_moved_piece_coords { get => _last_moved_piece_coords; set => _last_moved_piece_coords = value; }
+        public Color Last_moved_piece_coords_color { get => _last_moved_piece_coords_color; set => _last_moved_piece_coords_color = value; }
         private Random _rand = new Random();
 
         public Draughts_checkers(int number_of_fields_in_row_, int number_of_pieces_per_player)
@@ -105,6 +107,11 @@ namespace Checkers.Logic
             {
                 board_black = Rotate_board(board);
             }
+        }
+        public void Set_active_player(Color active_player_color)
+        {
+            if (Check_active_player() != active_player_color)
+            { Switch_player_turn(); }
         }
         private Checkers_piece[,] Rotate_board(Checkers_piece[,] board_to_rotate)
         {

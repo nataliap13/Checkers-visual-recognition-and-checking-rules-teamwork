@@ -21,7 +21,31 @@ namespace Checkers.Logic
 
         public Type Type { get => type; }
         public Color Color { get => color; }
+        public static bool operator ==(Checkers_piece a, Checkers_piece b)
+        {
+            if (System.Object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
 
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+            if (a != null && b != null)
+            {
+                if (a.Color == b.Color && a.Type == b.Type)
+                { return true; }
+                else { return false; }
+            }
+            else
+            { return false; }
+        }
+        public static bool operator !=(Checkers_piece a, Checkers_piece b)
+        { return !(a == b); }
+
+        public bool Equals(Checkers_piece other)
+        { return this == other; }
         override public string ToString()
         {
             if (type == Type.Man && color == Color.Black)

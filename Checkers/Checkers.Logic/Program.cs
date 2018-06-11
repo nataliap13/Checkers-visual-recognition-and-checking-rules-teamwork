@@ -13,7 +13,9 @@ namespace Checkers.Logic
         {
             try
             {
-                test_Piotrka();
+                test_move_detector_2();
+                //test_move_detector_1_no_move_detected();
+                //test_Piotrka();
                 //test_change_man_to_king();
                 //test_capturing_oponents_piece();
                 //test_capturing_multiple_oponents_pieces_by_one_piece();
@@ -67,6 +69,56 @@ namespace Checkers.Logic
             Display_board(game, game.Check_active_player());
         }
 
+        private static void test_move_detector_2()
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(Color.White);
+            var black_key = game.Generate_player_key(Color.Black);
+            
+            Draughts_checkers game2 = new Draughts_checkers(r, pcs);
+            var white_key2 = game2.Generate_player_key(Color.White);
+            var black_key2 = game2.Generate_player_key(Color.Black);
+
+            Make_move_and_display_boards(ref game2, white_key2, new Coordinates(0, 5), new Coordinates(1, 4));
+
+            //Display_board(game, Color.White);
+            //Display_board(game2, Color.White);
+            //Console.WriteLine("\ntry\n");
+            try
+            {
+                var move = Move_Detector.DetectMove(Color.White, game, game2.Get_copy_of_board(Color.Black));
+                Console.WriteLine("Wykryto ruch");
+                Make_move_and_display_boards(ref game, white_key, new Coordinates(move[0].X, move[0].Y), new Coordinates(move[1].X, move[1].Y));
+            }
+            catch (Exception e)
+            { Console.WriteLine(e.Message); }
+        }
+        private static void test_move_detector_1_no_move_detected()
+        {
+            const int r = 8;// number_of_fields_in_row = 8;
+            const int pcs = 12;// number_of_pieces_per_player = 12;
+            Draughts_checkers game = new Draughts_checkers(r, pcs);
+            var white_key = game.Generate_player_key(Color.White);
+            Console.WriteLine("White key: " + white_key);
+
+            var black_key = game.Generate_player_key(Color.Black);
+            Console.WriteLine("Black key: " + black_key);
+            Checkers_piece[,] board_black = new Checkers_piece[game.Number_of_fields_in_row, game.Number_of_fields_in_row];
+            {
+                Draughts_checkers game_temp = new Draughts_checkers(r, pcs);
+                board_black = game_temp.Get_copy_of_board(Color.Black);
+            }
+            Display_board(game);
+            try
+            {
+                var move = Move_Detector.DetectMove(Color.White, game, board_black);
+                Make_move_and_display_boards(ref game, black_key, new Coordinates(5, 0), new Coordinates(0, 5));
+            }
+            catch (Exception e)
+            { Console.WriteLine(e.Message); }
+        }
         private static void test_Piotrka()
         {
             const int r = 8;// number_of_fields_in_row = 8;
