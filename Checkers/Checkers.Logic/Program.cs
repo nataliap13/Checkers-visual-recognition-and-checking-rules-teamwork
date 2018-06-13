@@ -88,9 +88,12 @@ namespace Checkers.Logic
             //Console.WriteLine("\ntry\n");
             try
             {
-                var move = Move_Detector.DetectMove(Color.White, game, game2.Get_copy_of_board(Color.Black));
+                var move = Move_Detector.DetectMove(game.Check_active_player(), game, game2.Get_copy_of_board(Color.Black));
                 Console.WriteLine("Wykryto ruch");
                 Make_move_and_display_boards(ref game, white_key, new Coordinates(move[0].X, move[0].Y), new Coordinates(move[1].X, move[1].Y));
+
+                Make_move_and_display_boards(ref game2, black_key2, new Coordinates(0, 5), new Coordinates(1, 4));
+                move = Move_Detector.DetectMove(game.Check_active_player(), game, game2.Get_copy_of_board(Color.Black));
             }
             catch (Exception e)
             { Console.WriteLine(e.Message); }
