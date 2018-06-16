@@ -29,7 +29,7 @@ from Tests.Test_Movement import Movement
 
 
 class Server(EnvironmentSetup):
-
+    """Serwer tworzy pokoj"""
     def test_Piotrklient(self):
         www="https://www.kurnik.pl/warcaby/"
 # Using the driver instances created in EnvironmentSetup 
@@ -44,7 +44,7 @@ class Server(EnvironmentSetup):
 # LOG IN
         login=Login(driver)
         login.setLogin("piotrklient")
-        login.setPassword("haslooooo")
+        login.setPassword("Politechnika")
         login.click_EnterButton()
 
         start=Start(driver)

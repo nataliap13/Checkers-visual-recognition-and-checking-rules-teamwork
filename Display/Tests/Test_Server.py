@@ -21,7 +21,8 @@ from Pages.InviteSecondPlayer import InviteSecondPlayer
 from Pages.AcceptGamePage import AcceptGame
 from Tests.Test_Movement import Movement
 from Pages.KickOffPage import KickOff
-
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from Locators import Locator
 
 
@@ -29,6 +30,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 class Server(EnvironmentSetup):
+    """Inicjator połączenia"""
 
 
     def test_FirstPlayer(self):
@@ -42,25 +44,26 @@ class Server(EnvironmentSetup):
 
 # Creating object class Main
 
-        
+        print("1")
         welcome=Welcome(driver)
         window_before = driver.window_handles[0]
         welcome.click_ZalogujButton()
        
-
+        print("2")
         login=Login(driver)
         login.setLogin("piotr1500")
-        login.setPassword("haslooooo")
+        login.setPassword("Politechnika")
         login.click_EnterButton()
 
 
+        print("3")
         start=Start(driver)
         start.click_StartButton()
         window_after = driver.window_handles[1]
         driver.switch_to_window(window_after)
-        
+        print("4")
 
-        print("Waiting  choose900")
+        #print("Waiting  choose900")
 
 
         choose900=Choose900(driver)
@@ -90,15 +93,16 @@ class Server(EnvironmentSetup):
         #need to refactor
         time.sleep(2)
         p=Players(driver)
+        '''
         if p.NickPlayer.get_attribute("textContent") != "piotrklient":
             print("checking player")
             kickoff=KickOff(driver)
             kickoff.click_Kickoff()
-
+        
 
         if p.NickPlayer.get_attribute("textContent") == "piotrklient":
             print("gogo")
-        
+        '''
         WebDriverWait(driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "(//*[@class='butwb'])[2]")))
         #need to refactor
@@ -108,9 +112,12 @@ class Server(EnvironmentSetup):
         EC.element_to_be_clickable((By.XPATH, Locator.AcceptGame)))
         acceptgame.click_AcceptGame(driver)
 
-    
-
-
+        #print("1")
+        #driver.execute_script("document.body.style_zoom='130%'")
+        #driver.execute_script("document.body.style.zoom='90%'")
+        #time.sleep(1)
+        #driver.execute_script("document.body.style.zoom='100%'")
+        #print("2")
         Coordinates=driver.find_element_by_xpath("//*[contains(@style,'top: 504') and contains(@style,'left: 84')]")
         while(True):
             print("Before click")              

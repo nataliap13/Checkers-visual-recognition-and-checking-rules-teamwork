@@ -1,10 +1,11 @@
 class Locator(object):
-
+        """"Xpathy do selectorow """
 
 #  Welcome 
         GuestButton="//*[@class='lbut lbprm']"
         KindOfRoom="//*[@class='selcsl']"
         ZalogujButton="//*[@class='lbut lbpbg']"
+        nowyzaloguj="//*[@class='lbpbg']"
 
 #  Login 
         #LoginButton="//*[contains(text(), 'zaloguj')]"
@@ -13,7 +14,8 @@ class Locator(object):
         EnterButton="//*[@type='submit']"
 
 #  Start 
-        StartButton="//*[@class='lbut lbprm']"
+        #StartButton="//*[@class='lbut lbprm']"
+        StartButton="//*[@class='lbprm']"
 
 #  Choose Room
         ChooseKindOfRoom="//*[contains(text(), '#900')]"

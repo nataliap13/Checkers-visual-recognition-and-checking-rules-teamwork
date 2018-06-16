@@ -4,9 +4,30 @@ sys.path.append(parentddir)
 
 
 class Movement():
-   
+    """Klasa do wykonywania ruchów"""
+    '''
     @staticmethod
     def Get_and_Convert():
+        a = int(input("x "))
+        b = int(input("y "))
+
+        if a==0:
+            ilex=0
+        else:
+            ilex=69*(a)+35
+        if b==0:
+            iley=0
+        else:
+            iley=(-69)*(b-1)-35
+        #print("ilex",ilex)
+        #print("iley",iley)
+        return ilex,iley
+        '''
+
+
+    @staticmethod
+    def Get_and_Convert():
+        """Wykonywanie ruchow"""
         a = int(input("x "))
         b = int(input("y "))
 
