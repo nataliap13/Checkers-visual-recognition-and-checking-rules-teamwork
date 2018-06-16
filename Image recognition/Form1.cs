@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Checkers;
-using Checkers.Logic;
 using static Warcaby.RozpoznawaniePlanszy;
 using System.Diagnostics;
 using System.Threading;
+using Checkers.Logic;
 
 namespace Warcaby {
     public partial class Form1 : Form {
@@ -216,13 +215,7 @@ namespace Warcaby {
                     Server.StandardInput.WriteLine(move[1].X);
                     Server.StandardInput.WriteLine(move[1].Y);
                 }
-
-
             }
-
-
-
-
         }
 
         public static void Make_move_and_display_boards(ref Draughts_checkers game, int player_secret_key, Coordinates origin, Coordinates destination) {
