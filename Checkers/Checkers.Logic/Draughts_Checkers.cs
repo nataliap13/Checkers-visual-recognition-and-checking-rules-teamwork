@@ -64,24 +64,6 @@ namespace Checkers.Logic
         }
         public int Number_of_fields_in_row { get => _number_of_fields_in_row; }
         public int Number_of_pieces_per_player { get => _number_of_pieces_per_player; }
-        public int Number_of_pieces(Color color)
-        {
-            int number_of_pieces = 0;
-            for (int i = 0; i < _number_of_fields_in_row; i++)
-            {
-                for (int j = 0; j < _number_of_fields_in_row; j++)
-                {
-                    try
-                    {
-                        if (board_black[i, j].Color == color)
-                        { number_of_pieces++; }
-                    }
-                    catch (Exception)
-                    { }
-                }
-            }
-            return number_of_pieces;
-        }
 
         public Checkers_piece[,] Get_copy_of_board(Color color)
         {
@@ -193,7 +175,7 @@ namespace Checkers.Logic
             else
             { throw new Exception("Unexpected Switch_player_turn_key exception!"); };
         }
-        // Explicit predicate delegate.
+        
         private bool Find_last_moved_piece_in_way(List<Coordinates> way)
         {
             if (way[0] == _last_moved_piece_coords)
@@ -251,7 +233,6 @@ namespace Checkers.Logic
                 var y_distance = destination.Y - origin.Y;
                 if (length_of_capturing > 0)//bicie jest obowiazkowe
                 {
-
                     List<Coordinates> chosen_way = new List<Coordinates>();//szukanie sciezki wybranej przez gracza
                     foreach (var way in all_the_longest_possible_ways)
                     {
@@ -348,7 +329,7 @@ namespace Checkers.Logic
                     possible_ways = possible_ways.Concat(local_possible_ways).ToList();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             { }
             return possible_ways;
         }
@@ -616,7 +597,7 @@ namespace Checkers.Logic
             else if (board[origin.Y, origin.X].Type == Type.King)
             {
                 //Console.WriteLine("Przed zbiciem");
-                //Display_board_helper(work_board, Color.White);
+                //Display_Board.Display_board_array(board, _number_of_fields_in_row, Color.White);
                 board[destination.Y, destination.X] = board[origin.Y, origin.X];
                 board[origin.Y, origin.X] = null;
 
@@ -651,41 +632,12 @@ namespace Checkers.Logic
                         //Console.WriteLine("Null na " + (origin.X - i) + "," + (origin.Y - i));
                     }
                 }
-
-                //var possible_ways = Get_the_longest_capturings_for_this_piece(work_board, destination);
-
                 //Console.WriteLine("Po zbiciu");
-                //Display_board_helper(work_board, Color.White);
+                //Display_Board.Display_board_array(board, _number_of_fields_in_row, Color.White);
             }
             else
             { throw new Exception("Something went wrong with piece type in " + name_of_function + "!"); }
 
-        }
-
-        private void Display_board_helper(Checkers_piece[,] board, Color color)
-        {
-            Console.WriteLine("Display_board_helper");
-            Console.Write("\n---");
-            for (int i = 0; i < _number_of_fields_in_row; i++)
-            { Console.Write(i + " "); }
-
-            for (int i = 0; i < _number_of_fields_in_row; i++)//i is row
-            {
-                Console.Write("\n" + i + ". ");
-                for (int j = 0; j < _number_of_fields_in_row; j++)//j is column
-                {
-                    if (board[i, j] == null)
-                    { Console.Write("= "); }
-                    //{ Console.Write("# "); }
-                    else
-                    { Console.Write(board[i, j].ToString() + " "); }
-                }
-            }
-            Console.Write("\n---");
-            for (int i = 0; i < _number_of_fields_in_row; i++)
-            { Console.Write(i + " "); }
-            Console.Write(color + "\n");
-            Console.WriteLine("Display_board_helper END!");
         }
     }
 }
