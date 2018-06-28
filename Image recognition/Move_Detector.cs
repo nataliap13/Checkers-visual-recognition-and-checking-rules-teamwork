@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Checkers.Logic
 {
-    public class Move_Detector
+    public static class Move_Detector
     {
         private static Checkers_piece[,] Rotate_board(Checkers_piece[,] board_to_rotate, int number_of_fields_in_row)
         {

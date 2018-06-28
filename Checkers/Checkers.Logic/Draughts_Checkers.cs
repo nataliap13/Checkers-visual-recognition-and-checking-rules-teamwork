@@ -22,8 +22,6 @@ namespace Checkers.Logic
 
         public Draughts_checkers(int number_of_fields_in_row_, int number_of_pieces_per_player)
         {
-            //_last_moved_piece_coords = new Coordinates(0, 0);
-            //_last_moved_piece_coords_color = Color.Black;
             _number_of_pieces_per_player = number_of_pieces_per_player;
             if (number_of_pieces_per_player >= (number_of_fields_in_row_ * number_of_fields_in_row_ / 4))
             {
@@ -121,9 +119,7 @@ namespace Checkers.Logic
                 return _player_black_secret_key = _rand.Next(10000, 32000);
             }
             else
-            {
-                throw new Exception("Player " + color + " already exists!");
-            }
+            { throw new Exception("Player " + color + " already exists!"); }
 
         }
         public Color Check_active_player()
@@ -179,14 +175,9 @@ namespace Checkers.Logic
         private bool Find_last_moved_piece_in_way(List<Coordinates> way)
         {
             if (way[0] == _last_moved_piece_coords)
-            {
-                return true;
-            }
+            { return true; }
             else
-            {
-                return false;
-            }
-
+            { return false; }
         }
         public void Make_move(int player_secret_key, Coordinates origin, Coordinates destination)//int is error code, to be implemented
         {
@@ -637,7 +628,6 @@ namespace Checkers.Logic
             }
             else
             { throw new Exception("Something went wrong with piece type in " + name_of_function + "!"); }
-
         }
     }
 }
